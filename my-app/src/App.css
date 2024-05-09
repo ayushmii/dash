@@ -1,0 +1,41 @@
+/* App.css */
+body {
+  background-color: #30343e;
+  color: #fff;
+}
+
+.table {
+  color: #fff;
+}
+
+.table th {
+  background-color: #3c4048;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #373b42;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+  background-color: #282c34;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.modal-content {
+  background-color: #373b42;
+  color: #fff;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: #3c4048;
+}
