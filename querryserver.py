@@ -140,6 +140,10 @@ def get_synonyms(disease_name):
     else:
         print(f"Failed to fetch synonyms for '{disease_name}': {response.status_code} - {response.text}")
         return []
+    
+#The Count credentials for this database will be different.
+#Two option: Postgres or Oracle
+#Make Connection options dynamic
 
 def construct_query(disease_name, synonyms):
     # Prepare the disease name and synonyms for use in the query

@@ -1,5 +1,5 @@
 // require('dotenv').config();
-require('dotenv').config({ path: '../.env' });
+require("dotenv").config({ path: "../.env" });
 
 console.log(process.env.REACT_APP_DISEASE_APP_PORT); // 5354
 console.log(process.env.REACT_APP_DASHBOARD_APP_PORT); // 3434

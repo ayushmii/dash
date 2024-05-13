@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request,make_response
 import os
 import psycopg2
 import requests
@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env.
 
 
-CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 # Database connection
 conn = psycopg2.connect(
     host="localhost",
@@ -27,14 +27,21 @@ def after_request(response):
     return response
 
 # Endpoint to fetch the latest records from 'patient_counts_disease' table
-@app.route('/latest_records', methods=['GET'])
-def get_latest_records():
+@app.route('/latest_records_processing', methods=['GET'])
+def get_latest_records_processing():
     cur = conn.cursor()
-    cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = (SELECT MAX(info_id) FROM patient_counts_info);")
+    cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = (SELECT MAX(info_id) FROM patient_counts_info) AND Status!='Completed';")
     records = cur.fetchall()
     cur.close()
     return jsonify(records)
 
+@app.route('/latest_records_completed', methods=['GET'])
+def get_latest_records_completed():
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = (SELECT MAX(info_id) FROM patient_counts_info) AND Status = 'Completed';")
+    records = cur.fetchall()
+    cur.close()
+    return jsonify(records)
 
 # Endpoint to handle the disease count process
 # Route to add a new record to the patient_counts_info table
@@ -70,22 +77,26 @@ def add_patient_counts_disease():
     status = data['status']
 
     cur = conn.cursor()
-    cur.execute("INSERT INTO patient_counts_disease (info_id, sr_no, disease_desc, disease, visits, patients, discharge_summaries, ds_patients, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;", (info_id, sr_no, disease_desc, disease, visits, patients, discharge_summaries, ds_patients, status))
+    cur.execute("INSERT INTO patient_counts_disease (info_id, sr_no, disease_desc, disease, visits, patients, discharge_summaries, ds_patients, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING info_id,sr_no;", (info_id, sr_no, disease_desc, disease, visits, patients, discharge_summaries, ds_patients, status))
     new_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
 
-    return jsonify({'id': new_id})
-
+    return jsonify({'info_id': info_id,'sr_no': sr_no})
 @app.route('/patient_counts_disease/<int:id>', methods=['PUT'])
+
 def update_patient_counts_disease(id):
     data = request.get_json()
-    visits = data['visits']
-    patients = data['patients']
-    discharge_summaries = data['discharge_summaries']
-    ds_patients = data['ds_patients']
-    status = data['status']
-
+    print(request)
+    print("SDDDDDDDDDDDDDDDDDDDDDDD")
+    print(data)
+    visits = data.get('visits')  # Use .get() instead of direct access
+    patients = data.get('patients')
+    discharge_summaries = data.get('discharge_summaries')
+    ds_patients = data.get('ds_patients')
+    status = 'Completed'  # Set the status explicitly
+    sr_no = data.get('sr_no')
+    print(sr_no)
     cur = conn.cursor()
     cur.execute("""
         UPDATE patient_counts_disease
@@ -94,16 +105,16 @@ def update_patient_counts_disease(id):
             discharge_summaries = %s,
             ds_patients = %s,
             status = %s
-        WHERE info_id = %s
+        WHERE info_id = %s and sr_no=%s
         RETURNING *;
-    """, (visits, patients, discharge_summaries, ds_patients, status, id))
-
+    """, (visits, patients, discharge_summaries, ds_patients, status, id,sr_no))
+    print("Query exectued Successfully")
+    
     updated_record = cur.fetchone()
     conn.commit()
     cur.close()
-
     if updated_record:
-        return jsonify({
+        response=jsonify({
             'id': updated_record[0],
             'info_id': updated_record[1],
             'sr_no': updated_record[2],
@@ -115,6 +126,9 @@ def update_patient_counts_disease(id):
             'ds_patients': updated_record[8],
             'status': updated_record[9]
         })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    
     else:
         return jsonify({'message': 'No record found with the given ID'}), 404
 

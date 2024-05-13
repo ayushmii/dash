@@ -7,7 +7,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 function App() {
   console.log(process.env.DISEASE_APP_PORT);
   const [latestRecords, setLatestRecords] = useState([]);
-  const [additionalDiseaseNames, setAdditionalDiseaseNames] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     shortDesc: "",
@@ -15,9 +14,6 @@ function App() {
     dateTo: "",
     diseaseNames: "",
   });
-  const handleAdditionalDiseaseNamesChange = (event) => {
-    setAdditionalDiseaseNames(event.target.value);
-  };
   const [recordType, setRecordType] = useState("completed");
   useEffect(() => {
     console.log(latestRecords);
@@ -54,7 +50,17 @@ function App() {
   const handleModalClose = () => {
     setShowModal(false);
   };
-
+  const handleAddDisease = () => {
+    const newDiseaseName = prompt("Enter the new disease name:");
+    if (newDiseaseName) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        diseaseNames: `${
+          prevFormData.diseaseNames ? `${prevFormData.diseaseNames},` : ""
+        }${newDiseaseName.trim()}`,
+      }));
+    }
+  };
   const handleProceed = async () => {
     const { shortDesc, dateFrom, dateTo, diseaseNames } = formData;
     const diseaseNameList = diseaseNames.split(",").map((name) => name.trim());
@@ -160,116 +166,6 @@ function App() {
       console.error("Error adding new records:", error);
     }
   };
-  const handleProcessAdditionalDiseases = async () => {
-    const { shortDesc, dateFrom, dateTo } = formData;
-    const additionalDiseaseNameList = additionalDiseaseNames
-      .split(",")
-      .map((name) => name.trim())
-      .filter((name) => name !== "");
-
-    try {
-      // Add a new record to the patient_counts_info table
-      const infoResponse = await axios.post(
-        `http://localhost:5354/patient_counts_info`,
-        {
-          short_desc: shortDesc,
-          data_from: dateFrom,
-          data_upto: dateTo,
-          status: "Processing",
-        }
-      );
-      const newInfoId = infoResponse.data.info_id;
-      console.log(newInfoId);
-
-      // Add new records to the patient_counts_disease table
-      const diseasePromises = additionalDiseaseNameList.map(
-        async (diseaseName, index) => {
-          const diseaseResponse = await axios.post(
-            `http://localhost:5354/patient_counts_disease`,
-            {
-              info_id: newInfoId,
-              sr_no: index + 1,
-              disease_desc: shortDesc,
-              disease: diseaseName,
-              visits: null,
-              patients: null,
-              discharge_summaries: null,
-              ds_patients: null,
-              status: "Processing",
-            }
-          );
-          console.log(diseaseResponse.data);
-          return diseaseResponse.data;
-        }
-      );
-      const newDiseaseRecords = await Promise.all(diseasePromises);
-
-      // Call the backend API to process the disease counts
-      const updatedDiseaseRecords = await Promise.all(
-        additionalDiseaseNameList.map(async (diseaseName, index) => {
-          try {
-            const response = await axios.get(
-              `http://localhost:7655/disease_counts?disease_name=${diseaseName}&date_from=${dateFrom}&date_to=${dateTo}`
-            );
-            const diseaseCount = response.data;
-            console.log(diseaseCount);
-            console.log(newDiseaseRecords);
-            console.log(newInfoId);
-
-            // Find the record to update from newDiseaseRecords
-            const recordToUpdate = newDiseaseRecords.find(
-              (record) =>
-                record.info_id === newInfoId && record.sr_no === index + 1
-            );
-
-            console.log(recordToUpdate);
-            console.log(diseaseCount);
-
-            // Update the database with the response data
-            if (recordToUpdate) {
-              console.log(recordToUpdate.info_id);
-              const updateResponse = await axios.put(
-                `http://localhost:5354/patient_counts_disease/${recordToUpdate.info_id}`,
-                {
-                  sr_no: recordToUpdate.sr_no,
-                  visits: diseaseCount[0].visits,
-                  patients: diseaseCount[0].patients,
-                  discharge_summaries: diseaseCount[0].discharge_summaries,
-                  ds_patients: diseaseCount[0].ds_patients,
-                }
-              );
-
-              // Merge the updated record with the original record
-              const updatedRecord = {
-                ...recordToUpdate,
-                ...updateResponse.data,
-              };
-              return updatedRecord;
-            } else {
-              console.error(
-                `No record found for disease: ${diseaseName} with info_id: ${newInfoId} and sr_no: ${
-                  index + 1
-                }`
-              );
-            }
-          } catch (error) {
-            console.error("Error processing disease counts:", error);
-          }
-        })
-      );
-
-      // Remove undefined values from the updatedDiseaseRecords array
-      const filteredUpdatedRecords = updatedDiseaseRecords.filter(
-        (record) => record !== undefined
-      );
-
-      setLatestRecords([...latestRecords, ...filteredUpdatedRecords]);
-      setAdditionalDiseaseNames("");
-    } catch (error) {
-      console.error("Error adding new records:", error);
-    }
-  };
-
   <div style={{ position: "absolute", top: 0, right: 0 }}>
     {new Date().toLocaleDateString()}
   </div>;
@@ -334,22 +230,20 @@ function App() {
         >
           Processing Records
         </button>
+        <div>
+          <button className="btn btn-primary mr-2" onClick={handleAddDisease}>
+            Add Disease
+          </button>
+          <button className="btn btn-primary mr-2" onClick={handleNewSearch}>
+            New Search
+          </button>
+        </div>
       </div>
       <button className="btn btn-primary" onClick={handleNewSearch}>
         New Search
       </button>
       {recordsTable}
-      <div>
-        <input
-          type="text"
-          value={additionalDiseaseNames}
-          onChange={handleAdditionalDiseaseNamesChange}
-          placeholder="Enter additional disease names (comma-separated)"
-        />
-        <button onClick={handleProcessAdditionalDiseases}>
-          Process Additional Diseases
-        </button>
-      </div>
+
       <Modal show={showModal} onHide={handleModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>New Search</Modal.Title>

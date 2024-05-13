@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Modal, Button, Form } from "react-bootstrap";
 
 function App() {
   const [latestRecords, setLatestRecords] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    shortDesc: '',
-    dateFrom: '',
-    dateTo: '',
-    diseaseNames: ''
+    shortDesc: "",
+    dateFrom: "",
+    dateTo: "",
+    diseaseNames: "",
   });
 
   useEffect(() => {
@@ -18,10 +18,12 @@ function App() {
 
   const fetchLatestRecords = async () => {
     try {
-      const response = await axios.get(`http://localhost:${process.env.DISEASE_APP_PORT}/latest_records`);
+      const response = await axios.get(
+        `http://localhost:${process.env.DISEASE_APP_PORT}/latest_records`
+      );
       setLatestRecords(response.data);
     } catch (error) {
-      console.error('Error fetching latest records:', error);
+      console.error("Error fetching latest records:", error);
     }
   };
 
@@ -29,7 +31,7 @@ function App() {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -43,50 +45,60 @@ function App() {
 
   const handleProceed = async () => {
     const { shortDesc, dateFrom, dateTo, diseaseNames } = formData;
-    const diseaseNameList = diseaseNames.split(',').map(name => name.trim());
+    const diseaseNameList = diseaseNames.split(",").map((name) => name.trim());
 
     try {
       // Add a new record to the patient_counts_info table
-      const infoResponse = await axios.post(`http://localhost:${process.env.DISEASE_APP_PORT}/patient_counts_info`, {
-        short_desc: shortDesc,
-        data_from: dateFrom,
-        data_upto: dateTo,
-        status: 'Processing'
-      });
+      const infoResponse = await axios.post(
+        `http://localhost:${process.env.DISEASE_APP_PORT}/patient_counts_info`,
+        {
+          short_desc: shortDesc,
+          data_from: dateFrom,
+          data_upto: dateTo,
+          status: "Processing",
+        }
+      );
       const newInfoId = infoResponse.data.info_id;
 
       // Add new records to the patient_counts_disease table
-      const diseasePromises = diseaseNameList.map(async (diseaseName, index) => {
-        const diseaseResponse = await axios.post(`http://localhost:${process.env.DISEASE_APP_PORT}/patient_counts_disease`, {
-          info_id: newInfoId,
-          sr_no: index + 1,
-          disease_desc: diseaseName,
-          disease: diseaseName,
-          visits: null,
-          patients: null,
-          discharge_summaries: null,
-          ds_patients: null,
-          status: 'Processing'
-        });
-        return diseaseResponse.data;
-      });
+      const diseasePromises = diseaseNameList.map(
+        async (diseaseName, index) => {
+          const diseaseResponse = await axios.post(
+            `http://localhost:${process.env.DISEASE_APP_PORT}/patient_counts_disease`,
+            {
+              info_id: newInfoId,
+              sr_no: index + 1,
+              disease_desc: diseaseName,
+              disease: diseaseName,
+              visits: null,
+              patients: null,
+              discharge_summaries: null,
+              ds_patients: null,
+              status: "Processing",
+            }
+          );
+          return diseaseResponse.data;
+        }
+      );
       const newDiseaseRecords = await Promise.all(diseasePromises);
 
       // Call the backend API to process the disease counts
       for (const diseaseName of diseaseNameList) {
         try {
-          const response = await axios.get(`http://localhost:${process.env.QUERRY_SERVER_PORT}/disease_counts?disease_name=${diseaseName}&date_from=${dateFrom}&date_to=${dateTo}`);
+          const response = await axios.get(
+            `http://localhost:${process.env.QUERRY_SERVER_PORT}/disease_counts?disease_name=${diseaseName}&date_from=${dateFrom}&date_to=${dateTo}`
+          );
           console.log(response.data);
           // Update the database with the response data
         } catch (error) {
-          console.error('Error processing disease counts:', error);
+          console.error("Error processing disease counts:", error);
         }
       }
 
       setShowModal(false);
       fetchLatestRecords();
     } catch (error) {
-      console.error('Error adding new records:', error);
+      console.error("Error adding new records:", error);
     }
   };
 
