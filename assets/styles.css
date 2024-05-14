@@ -1,12 +1,39 @@
+/* Variables for light and dark mode */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --accent-color: #189de4;
+  --accent-color-light: #52b7e9;
+  --accent-color-dark: #146ca4;
+  --secondary-color: #46648c;
+  --dark-color: #242444;
+}
+
+.dark-mode {
+  --bg-color: #242444;
+  --text-color: #ffffff;
+  --accent-color: #52b7e9;
+  --accent-color-light: #189de4;
+  --accent-color-dark: #146ca4;
+  --secondary-color: #46648c;
+  --dark-color: #000000;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
 .single-card-wrapper {
   transition: all 0.3s ease;
 }
+
 .header-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #2c3e50;
+  justify-content: space-between;
+  background-color: var(--accent-color);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -16,31 +43,44 @@
   max-height: 80px;
   padding-right: 20px;
 }
+
 .dash-outer-container {
-  margin: 0 10px; /* Adjust the values as needed */
+  margin: 0 10px;
 }
+
 .header-title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #ffffff;
+  color: var(--bg-color);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin: 0;
 }
+
+.theme-toggle {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--bg-color);
+}
+
 .single-card-wrapper:hover {
-  background-color: rgba(50, 50, 50, 0.8);
+  background-color: var(--accent-color-light);
   transform: scale(1.05);
 }
+
 .single-card-wrapper {
   margin-bottom: 20px !important;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
 
 .card-hover-container {
-  border: 0.5px solid #ffffff1e !important;
-  border-radius: 26px !important;
+  border: 1px solid var(--secondary-color) !important;
+  border-radius: 10px !important;
   height: 300px !important;
   display: flex !important;
   flex-direction: column !important;
-  align-items: center !important ;
+  align-items: center !important;
   justify-content: center !important;
   overflow: hidden !important;
   position: relative !important;
@@ -48,20 +88,23 @@
   position: relative !important;
   aspect-ratio: 1 !important;
   transition: all 0.3s !important;
+  background-color: var(--bg-color);
 }
 
 .card-hover-container:hover {
   transform: scale(1.05) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .card-gradient {
   height: 100% !important;
   width: 100% !important;
   position: absolute !important;
-  background: radial-gradient(#171825 40%, #63e 50%, #8e64ff, #f92672) !important;
+  background: radial-gradient(var(--dark-color) 40%, var(--accent-color) 50%, var(--accent-color-dark), var(--secondary-color)) !important;
   mix-blend-mode: darken !important;
   pointer-events: none !important;
   z-index: 3 !important;
+  opacity: 0.5;
 }
 
 .card-bg-characters {
@@ -74,21 +117,11 @@
   overflow: hidden !important;
   font-family: monospace !important;
   line-height: 1.15 !important;
-  color: #fff !important;
+  color: var(--text-color) !important;
   opacity: 0 !important;
   transition: opacity 0.5s !important;
-  -webkit-mask-image: radial-gradient(
-      300px circle at var(--x) var(--y) ,
-      #000 20%,
-      rgba(0, 0, 0, 0.25),
-      transparent 
-  ) !important;
-  mask-image: radial-gradient(
-      300px circle at var(--x) var(--y),
-      #000 20%,
-      rgba(0, 0, 0, 0.25),
-      transparent
-  ) !important;
+  -webkit-mask-image: radial-gradient(300px circle at var(--x) var(--y), #000 20%, rgba(0, 0, 0, 0.25), transparent) !important;
+  mask-image: radial-gradient(300px circle at var(--x) var(--y), #000 20%, rgba(0, 0, 0, 0.25), transparent) !important;
   transform: scale(1.025) !important;
 }
 
@@ -106,10 +139,12 @@
 .card-content h3 {
   font-size: 24px !important;
   margin-bottom: 10px !important;
+  color: var(--text-color);
 }
 
 .card-content p {
   font-size: 18px !important;
   font-weight: bold !important;
   margin: 0 !important;
+  color: var(--text-color);
 }

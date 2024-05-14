@@ -29,39 +29,61 @@ def after_request(response):
 # Endpoint to fetch the latest records from 'patient_counts_disease' table
 @app.route('/latest_records_processing', methods=['GET'])
 def get_latest_records_processing():
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = (SELECT MAX(info_id) FROM patient_counts_info) AND Status!='Completed';")
-    records = cur.fetchall()
-    cur.close()
-    return jsonify(records)
-
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = (SELECT MAX(info_id) FROM patient_counts_info) AND Status!='Completed';")
+        records = cur.fetchall()
+        cur.close()
+        return jsonify(records)
+    except Exception as e:
+        print(e)
 @app.route('/latest_records_completed', methods=['GET'])
 def get_latest_records_completed():
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = (SELECT MAX(info_id) FROM patient_counts_info) AND Status = 'Completed';")
-    records = cur.fetchall()
-    cur.close()
-    return jsonify(records)
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = (SELECT MAX(info_id) FROM patient_counts_info) AND Status = 'Completed';")
+        records = cur.fetchall()
+        cur.close()
+        return jsonify(records)
+    except Exception as e:
+        print(e)
 
+
+@app.route('/infoid_records', methods=['GET'])
+def get_infoid_records():
+    try:
+        cur = conn.cursor()
+        info_id = request.args.get('info_id')  # Retrieve info_id from query parameter
+        if info_id:
+            cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = %s;", (info_id,))
+            records = cur.fetchall()
+        else:
+            records = []
+        cur.close()
+        return jsonify(records)
+    except Exception as e:
+        print(e)
 # Endpoint to handle the disease count process
 # Route to add a new record to the patient_counts_info table
 @app.route('/patient_counts_info', methods=['POST'])
 def add_patient_counts_info():
-    data = request.get_json()
-    short_desc = data['short_desc']
-    data_from = data['data_from']
-    data_upto = data['data_upto']
-    status = data['status']
+    try:
+        data = request.get_json()
+        short_desc = data['short_desc']
+        data_from = data['data_from']
+        data_upto = data['data_upto']
+        status = data['status']
 
-    cur = conn.cursor()
-    cur.execute("INSERT INTO patient_counts_info (short_desc, data_from, data_upto, status, process_date) VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP) RETURNING info_id;", (short_desc, data_from, data_upto, status))
-    new_info_id = cur.fetchone()[0]
-        
-    conn.commit()
-    cur.close()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO patient_counts_info (short_desc, data_from, data_upto, status, process_date) VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP) RETURNING info_id;", (short_desc, data_from, data_upto, status))
+        new_info_id = cur.fetchone()[0]
+            
+        conn.commit()
+        cur.close()
 
-    return jsonify({'info_id': new_info_id})
-
+        return jsonify({'info_id': new_info_id})
+    except Exception as e:
+        print(e) 
 # Route to add a new record to the patient_counts_disease table
 @app.route('/patient_counts_disease', methods=['POST'])
 def add_patient_counts_disease():

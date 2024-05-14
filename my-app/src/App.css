@@ -1,4 +1,6 @@
 /* App.css */
+
+
 body {
   background-color: #30343e;
   color: #fff;
@@ -11,6 +13,8 @@ body {
 .table th {
   background-color: #3c4048;
 }
+
+
 
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: #373b42;

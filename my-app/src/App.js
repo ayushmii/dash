@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import "./App.css";
-import { Modal, Button, Form } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './App.css';
+import { Modal, Button, Form } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import RecordsTable from './ShowRecords'; // Make sure the import path is correct
 
 function App() {
   console.log(process.env.DISEASE_APP_PORT);
   const [latestRecords, setLatestRecords] = useState([]);
   const [additionalDiseaseNames, setAdditionalDiseaseNames] = useState("");
+  const [infoId, setInfoId] = useState(null);
+
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     shortDesc: "",
@@ -19,6 +22,17 @@ function App() {
     setAdditionalDiseaseNames(event.target.value);
   };
   const [recordType, setRecordType] = useState("completed");
+  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [shouldRefreshRecords, setShouldRefreshRecords] = useState(false);
+
+  const handleRefreshRecords = () => {
+    setShouldRefreshRecords((prevState) => !prevState);
+  };
+  useEffect(() => {
+    // Trigger a re-render of the RecordsTable component
+    setShouldRefresh((prevState) => !prevState);
+  }, [infoId, latestRecords]);
+
   useEffect(() => {
     console.log(latestRecords);
   }, [latestRecords]);
@@ -26,7 +40,23 @@ function App() {
   useEffect(() => {
     fetchLatestRecords(recordType);
   }, [recordType]);
-
+  const createNewInfoRecord = async (shortDesc, dateFrom, dateTo) => {
+    try {
+      const infoResponse = await axios.post(
+        `http://localhost:5354/patient_counts_info`,
+        {
+          short_desc: shortDesc,
+          data_from: dateFrom,
+          data_upto: dateTo,
+          status: "Processing",
+        }
+      );
+      return infoResponse.data.info_id;
+    } catch (error) {
+      console.error("Error creating new info record:", error);
+      return null;
+    }
+  };
   const fetchLatestRecords = async (type) => {
     try {
       const response = await axios.get(
@@ -71,6 +101,7 @@ function App() {
         }
       );
       const newInfoId = infoResponse.data.info_id;
+      setInfoId(newInfoId);
       console.log(newInfoId);
       // Add new records to the patient_counts_disease table
       const diseasePromises = diseaseNameList.map(
@@ -156,6 +187,7 @@ function App() {
 
       setLatestRecords(filteredUpdatedRecords);
       setShowModal(false);
+      handleRefreshRecords(); 
     } catch (error) {
       console.error("Error adding new records:", error);
     }
@@ -169,16 +201,7 @@ function App() {
 
     try {
       // Add a new record to the patient_counts_info table
-      const infoResponse = await axios.post(
-        `http://localhost:5354/patient_counts_info`,
-        {
-          short_desc: shortDesc,
-          data_from: dateFrom,
-          data_upto: dateTo,
-          status: "Processing",
-        }
-      );
-      const newInfoId = infoResponse.data.info_id;
+      const newInfoId = infoId;
       console.log(newInfoId);
 
       // Add new records to the patient_counts_disease table
@@ -265,6 +288,7 @@ function App() {
 
       setLatestRecords([...latestRecords, ...filteredUpdatedRecords]);
       setAdditionalDiseaseNames("");
+      handleRefreshRecords(); 
     } catch (error) {
       console.error("Error adding new records:", error);
     }
@@ -314,7 +338,10 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Patient Counts Disease</h1>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h1 style={{ margin: 0 }}>Patient Counts Disease</h1>
+            <h3 style={{ margin: 0 }}>({formData.shortDesc})</h3>
+        </div>
       <div>
         <button
           className="btn btn-primary mr-2"
@@ -346,10 +373,11 @@ function App() {
           onChange={handleAdditionalDiseaseNamesChange}
           placeholder="Enter additional disease names (comma-separated)"
         />
-        <button onClick={handleProcessAdditionalDiseases}>
+        <button className='btn-9' onClick={handleProcessAdditionalDiseases}>
           Process Additional Diseases
         </button>
       </div>
+      <RecordsTable infoId={infoId} shouldRefresh={shouldRefresh} />
       <Modal show={showModal} onHide={handleModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>New Search</Modal.Title>

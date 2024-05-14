@@ -7,12 +7,10 @@ import plotly.express as px
 import plotly.graph_objs as go
 from flask import Flask
 import dash_bootstrap_components as dbc
-import os
 from dash_bootstrap_templates import ThemeSwitchAIO
 from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
-
 
 styles_path = 'styles.css'  # If the file is in the same directory as your Python script
 # styles_path = 'path/to/styles.css'  # If the file is in a different directory
@@ -25,63 +23,36 @@ if os.path.isfile(styles_path):
         print("Openend")
 else:
     print(f"The file '{styles_path}' does not exist.")
+
 # Flask app and Dash app
 app = Flask(__name__)
-dash_app = Dash(server=app, routes_pathname_prefix='/dash/', external_stylesheets=[ styles_path,dbc.themes.BOOTSTRAP])
+dash_app = Dash(server=app, routes_pathname_prefix='/dash/', external_stylesheets=[styles_path, dbc.themes.BOOTSTRAP])
 
 # Default date range
 start_date = datetime(2010, 1, 1)
 end_date = datetime(2019, 12, 31)
 
 # Fetch department names
-dept_names = requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT')}/departments").json()
+dept_names = requests.get(f"http://localhost:5555/departments").json()
 
 # Dash layout
 dash_app.layout = dbc.Container([
     dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.Img(src="assets/logo.png", className="logo"),
+                    html.H1("Sanjay Gandhi Postgraduate Institute of Medical Sciences", className="header-title")
+                ], className="header-container")
+            ], width=12)
+        ]),
+    ]),
     dbc.Row([
         dbc.Col([
-            html.Div([
-                html.Img(src="assets/logo.png", className="logo"),
-                html.H1("Sanjay Gandhi Postgraduate Institute of Medical Sciences", className="header-title")
-            ], className="header-container")
-        ], width=12)
+            ThemeSwitchAIO(aio_id="theme", icons={"left": "fa fa-moon", "right": "fa fa-sun"}),
+        ], width=2),
     ]),
-  
-    # ... (existing layout code)
-]),
     dbc.Row([
-        dbc.Col([
-            html.H1("Medical Dashboard", className="text-center mb-4")
-        ], width=12)
-    ]),
-   dbc.Row([
-        dbc.Col([
-            dbc.Label('Department Filter'),
-            dcc.Dropdown(
-                id='dept-filter',
-                options=[{'label': 'All Departments', 'value': 'all'}] + [{'label': dept, 'value': dept} for dept in dept_names],
-                value='all',
-                multi=True
-            ),
-            dbc.Label('Date Range Filter', className="mt-3"),
-            dcc.DatePickerRange(
-                id='date-range-filter',
-                start_date=start_date,
-                end_date=end_date
-            ),
-            dbc.Label('Grouping', className="mt-3"),
-            dcc.RadioItems(
-                id='grouping',
-                options=[
-                    {'label': 'Weekly', 'value': 'weekly'},
-                    {'label': 'Monthly', 'value': 'monthly'},
-                    {'label': 'Yearly', 'value': 'yearly'}
-                ],
-                value='monthly'
-            )
-        ], width=3,),
-        # ... (existing layout code)
         dbc.Col([
             html.Div([
                 html.Div([
@@ -90,8 +61,53 @@ dash_app.layout = dbc.Container([
                     html.Button('Search', id='search-button', n_clicks=0, className='mt-2')
                 ], className='card-content')
             ], className='single-card-wrapper')
-        ], width=4)
-        ,dbc.Col([
+        ], width=3),
+        dbc.Col([
+            html.Div([
+                html.Div([
+                    html.H3('Department Filter'),
+                    dcc.Dropdown(
+                        id='dept-filter',
+                        options=[{'label': 'All Departments', 'value': 'all'}] + [{'label': dept, 'value': dept} for dept in
+                                                                                dept_names],
+                        value='all',
+                        multi=True,
+                        className='mt-2'
+                    )
+                ], className='card-content')
+            ], className='single-card-wrapper')
+        ], width=3, ),
+        dbc.Col([
+            html.Div([
+                html.Div([
+                    html.H3('Date Range Filter'),
+                    dcc.DatePickerRange(
+                        id='date-range-filter',
+                        start_date=start_date,
+                        end_date=end_date,
+                        className='mt-2'
+                    ),
+                ], className='card-content')
+            ], className='single-card-wrapper')
+        ], width=3, ),
+        dbc.Col([
+            html.Div([
+                html.Div([
+                    html.H3('Grouping'),
+                    dcc.Dropdown(
+                        id='grouping',
+                        options=[
+                            {'label': 'Weekly', 'value': 'weekly'},
+                            {'label': 'Monthly', 'value': 'monthly'},
+                            {'label': 'Yearly', 'value': 'yearly'}
+                        ],
+                        value='monthly',
+                        className='mt-2'
+                    )
+                ], className='card-content')
+            ], className='single-card-wrapper')
+        ], width=3, ),
+        dbc.Col([
             html.Div(id='disease-link')  # Added the container here
         ], width=8)
     ]),
@@ -124,11 +140,6 @@ dash_app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            ThemeSwitchAIO(aio_id="theme", icons={"left": "fa fa-sun", "right": "fa fa-moon"}),
-        ], width=2),
-    ]),
-    dbc.Row([
-        dbc.Col([
             dcc.Loading(
                 id='patient-count-loading',
                 type='default',
@@ -146,7 +157,8 @@ dash_app.layout = dbc.Container([
                 ]
             )
         ], width=6)
-    ], style={'backgroundColor': 'rgba(30, 30, 30, 0.8)', 'padding': '10px', 'borderRadius': '5px', 'marginBottom': '20px'}),
+    ], style={'backgroundColor': 'rgba(30, 30, 30, 0.8)', 'padding': '10px', 'borderRadius': '5px',
+              'marginBottom': '20px'}),
     dbc.Row([
         dbc.Col([
             dcc.Loading(
@@ -157,10 +169,11 @@ dash_app.layout = dbc.Container([
                 ]
             )
         ], width=6)
-    ], style={'backgroundColor': 'rgba(30, 30, 30, 0.8)', 'padding': '10px', 'borderRadius': '5px', 'marginBottom': '20px'})
-])
+    ], style={'backgroundColor': 'rgba(30, 30, 30, 0.8)', 'padding': '10px', 'borderRadius': '5px',
+              'marginBottom': '20px'})
+], fluid=True)
 
-import dash 
+import dash
 
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -184,6 +197,7 @@ def search_disease(n_clicks, disease_name):
             return html.A(href=disease_data_url, target="_blank", children="Open Disease Data")
         else:
             return None
+
 # Callback functions
 @dash_app.callback(
     [
@@ -198,13 +212,13 @@ def search_disease(n_clicks, disease_name):
 )
 def update_charts(selected_depts, start_date, end_date, grouping):
     if 'all' in selected_depts:
-        dept_names = ','.join(requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT')}/departments").json())
+        dept_names = ','.join(requests.get(f"http://localhost:5555/departments").json())
     else:
         dept_names = ','.join(selected_depts)
 
     start_date = datetime.fromisoformat(start_date).strftime('%Y-%m-%d')
     end_date = datetime.fromisoformat(end_date).strftime('%Y-%m-%d')
-    api_url = f"http://localhost:{os.getenv('QUERRY_SERVER_PORT')}/patient_counts?dept_names={dept_names}&start_date={start_date}&end_date={end_date}&grouping={grouping}"
+    api_url = f"http://localhost:5555/patient_counts?dept_names={dept_names}&start_date={start_date}&end_date={end_date}&grouping={grouping}"
     response = requests.get(api_url)
     data = response.json()
     df = pd.DataFrame(data)
