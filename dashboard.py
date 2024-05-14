@@ -7,7 +7,6 @@ import plotly.express as px
 import plotly.graph_objs as go
 from flask import Flask
 import dash_bootstrap_components as dbc
-from dash_bootstrap_templates import ThemeSwitchAIO
 from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
@@ -49,16 +48,16 @@ dash_app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            ThemeSwitchAIO(aio_id="theme", icons={"left": "fa fa-moon", "right": "fa fa-sun"}),
-        ], width=2),
-    ]),
-    dbc.Row([
-        dbc.Col([
             html.Div([
                 html.Div([
-                    html.H3('Disease Name'),
-                    dcc.Input(id='disease-name-input', type='text', placeholder='Enter disease name'),
-                    html.Button('Search', id='search-button', n_clicks=0, className='mt-2')
+                    html.H3('Search Disease Data'),
+                    dcc.Input(id='disease-name-input', type='text', placeholder='Enter disease name', className='form-control',
+    style={
+        'backgroundColor': '#2c2c2c',
+        'color': '#ffffff',
+        'borderColor': '#4d4d4d'
+    }),
+                    html.Button('Search', id='search-button', n_clicks=0, className='searchbutton btn btn-primary mt-2')
                 ], className='card-content')
             ], className='single-card-wrapper')
         ], width=3),
@@ -72,24 +71,36 @@ dash_app.layout = dbc.Container([
                                                                                 dept_names],
                         value='all',
                         multi=True,
-                        className='mt-2'
+                        className='form-control mt-2',
+    style={
+        'backgroundColor': '#2c2c2c',
+        'color': '#ffffff',
+        'borderColor': '#4d4d4d'
+    }
                     )
                 ], className='card-content')
             ], className='single-card-wrapper')
         ], width=3, ),
         dbc.Col([
-            html.Div([
-                html.Div([
-                    html.H3('Date Range Filter'),
-                    dcc.DatePickerRange(
-                        id='date-range-filter',
-                        start_date=start_date,
-                        end_date=end_date,
-                        className='mt-2'
-                    ),
-                ], className='card-content')
-            ], className='single-card-wrapper')
-        ], width=3, ),
+    html.Div([
+        html.Div([
+            html.H3('Date Range Filter'),
+            dcc.DatePickerRange(
+                id='date-range-filter',
+                start_date=start_date,
+                end_date=end_date,
+                className='form-control mt-2',
+                style={
+                    'backgroundColor': '#2c2c2c',
+                    'color': '#ffffff',
+                    'borderColor': '#4d4d4d'
+                },
+                start_date_placeholder_text='Start Date',
+                end_date_placeholder_text='End Date'
+            )
+        ], className='card-content')
+    ], className='single-card-wrapper')
+], width=3),
         dbc.Col([
             html.Div([
                 html.Div([
@@ -102,7 +113,13 @@ dash_app.layout = dbc.Container([
                             {'label': 'Yearly', 'value': 'yearly'}
                         ],
                         value='monthly',
-                        className='mt-2'
+                        className='form-control mt-2',
+                        
+    style={
+        'backgroundColor': '#2c2c2c',
+        'color': '#ffffff',
+        'borderColor': '#4d4d4d'
+    }
                     )
                 ], className='card-content')
             ], className='single-card-wrapper')
@@ -225,17 +242,44 @@ def update_charts(selected_depts, start_date, end_date, grouping):
 
     # Number of Patients
     patient_count_chart = px.line(df[df['col1'] == 'ENCOUNTER'], x='data_date', y='patient_count', color='dept_name')
-    patient_count_chart.update_layout(title='Number of Patients', xaxis_title='Time', yaxis_title='Patient Count')
+    patient_count_chart.update_layout(
+        title='Number of Patients',
+        xaxis_title='Time',
+        yaxis_title='Patient Count',
+        plot_bgcolor='rgba(17, 17, 17, 1)',  # Set plot background color to dark grey
+        paper_bgcolor='rgba(17, 17, 17, 1)',  # Set paper background color to dark grey
+        font_color='white',  # Set font color to white
+        xaxis_gridcolor='rgba(51, 51, 51, 1)',  # Set grid line color for x-axis
+        yaxis_gridcolor='rgba(51, 51, 51, 1)',  # Set grid line color for y-axis
+    )
 
     # Admissions
     admissions_df = df[df['col1'] == 'ADMISSIONS']
     admissions_chart = px.line(admissions_df, x='data_date', y=['rec_count', 'patient_count'], color='dept_name')
-    admissions_chart.update_layout(title='Admissions', xaxis_title='Date', yaxis_title='Count')
+    admissions_chart.update_layout(
+        title='Admissions',
+        xaxis_title='Date',
+        yaxis_title='Count',
+        plot_bgcolor='rgba(17, 17, 17, 1)',
+        paper_bgcolor='rgba(17, 17, 17, 1)',
+        font_color='white',
+        xaxis_gridcolor='rgba(51, 51, 51, 1)',
+        yaxis_gridcolor='rgba(51, 51, 51, 1)',
+    )
 
     # Visits
     visits_df = df[(df['col1'] == 'ENCOUNTER') | (df['col1'] == 'VISIT')]
     visits_chart = px.line(visits_df, x='data_date', y='rec_count', color='dept_name')
-    visits_chart.update_layout(title='Visits', xaxis_title='Date', yaxis_title='Visit Count')
+    visits_chart.update_layout(
+        title='Visits',
+        xaxis_title='Date',
+        yaxis_title='Visit Count',
+        plot_bgcolor='rgba(17, 17, 17, 1)',
+        paper_bgcolor='rgba(17, 17, 17, 1)',
+        font_color='white',
+        xaxis_gridcolor='rgba(51, 51, 51, 1)',
+        yaxis_gridcolor='rgba(51, 51, 51, 1)',
+    )
     total_patients = df[df['col1'] == 'ENCOUNTER']['patient_count'].sum()
 
     # Calculate total visits
