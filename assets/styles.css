@@ -6,8 +6,11 @@
   --background-color: #000000;
   --text-color: #ffffff;
   --card-hover-color: #242444;
+  --placeholder-color:#a9a9a9;
 }
-
+.form-control::placeholder {
+  color: var(--placeholder-color); /* or any other desired color */
+}
 /* Add background color to the body */
 body {
   background-color: var(--background-color);
@@ -189,4 +192,17 @@ body {
   color: var(--text-color);
   text-align: center;
   margin-bottom: 20px;
+}
+
+.Select-value-label {
+  color: white !important;
+}
+
+.Select-menu-outer {
+  z-index: 9999 !important;
+  transition: visibility 0.2s, opacity 0.2s linear;
+}
+
+.VirtualizedSelectOption {
+  color: black !important;
 }

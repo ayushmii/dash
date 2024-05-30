@@ -1,11 +1,12 @@
 import os
-import requests
-from datetime import datetime
 from dash import Dash, dcc, html, Input, Output, State
+from datetime import datetime
+import requests
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from flask import Flask
+from dash import Dash, dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 from dotenv import load_dotenv
 
@@ -19,7 +20,7 @@ if os.path.isfile(styles_path):
     print(f"The file '{styles_path}' exists.")
     # You can perform additional operations here, such as reading the file contents
     with open(styles_path, 'r') as file:
-        print("Openend")
+        print("Opened")
 else:
     print(f"The file '{styles_path}' does not exist.")
 
@@ -52,11 +53,11 @@ dash_app.layout = dbc.Container([
                 html.Div([
                     html.H3('Search Disease Data'),
                     dcc.Input(id='disease-name-input', type='text', placeholder='Enter disease name', className='form-control',
-    style={
-        'backgroundColor': '#2c2c2c',
-        'color': '#ffffff',
-        'borderColor': '#4d4d4d'
-    }),
+                              style={
+                                  'backgroundColor': '#2c2c2c',
+                                  'color': '#ffffff',
+                                  'borderColor': '#4d4d4d'
+                              }),
                     html.Button('Search', id='search-button', n_clicks=0, className='searchbutton btn btn-primary mt-2')
                 ], className='card-content')
             ], className='single-card-wrapper')
@@ -67,40 +68,39 @@ dash_app.layout = dbc.Container([
                     html.H3('Department Filter'),
                     dcc.Dropdown(
                         id='dept-filter',
-                        options=[{'label': 'All Departments', 'value': 'all'}] + [{'label': dept, 'value': dept} for dept in
-                                                                                dept_names],
+                        options=[{'label': 'All Departments', 'value': 'all'}] + [{'label': dept, 'value': dept} for dept in dept_names],
                         value='all',
                         multi=True,
                         className='form-control mt-2',
-    style={
-        'backgroundColor': '#2c2c2c',
-        'color': '#ffffff',
-        'borderColor': '#4d4d4d'
-    }
+                        style={
+                            'backgroundColor': '#2c2c2c',
+                            'color': '#ffffff',
+                            'borderColor': '#4d4d4d'
+                        }
+                    )
+                ], className='card-content', style={'overflow': 'visible'})
+            ], className='single-card-wrapper', style={'overflow': 'visible'})
+        ], width=3, style={'overflow': 'visible'}),
+        dbc.Col([
+            html.Div([
+                html.Div([
+                    html.H3('Date Range Filter'),
+                    dcc.DatePickerRange(
+                        id='date-range-filter',
+                        start_date=start_date,
+                        end_date=end_date,
+                        className='form-control mt-2',
+                        style={
+                            'backgroundColor': '#2c2c2c',
+                            'color': '#ffffff',
+                            'borderColor': '#4d4d4d'
+                        },
+                        start_date_placeholder_text='Start Date',
+                        end_date_placeholder_text='End Date'
                     )
                 ], className='card-content')
             ], className='single-card-wrapper')
-        ], width=3, ),
-        dbc.Col([
-    html.Div([
-        html.Div([
-            html.H3('Date Range Filter'),
-            dcc.DatePickerRange(
-                id='date-range-filter',
-                start_date=start_date,
-                end_date=end_date,
-                className='form-control mt-2',
-                style={
-                    'backgroundColor': '#2c2c2c',
-                    'color': '#ffffff',
-                    'borderColor': '#4d4d4d'
-                },
-                start_date_placeholder_text='Start Date',
-                end_date_placeholder_text='End Date'
-            )
-        ], className='card-content')
-    ], className='single-card-wrapper')
-], width=3),
+        ], width=3),
         dbc.Col([
             html.Div([
                 html.Div([
@@ -114,16 +114,15 @@ dash_app.layout = dbc.Container([
                         ],
                         value='monthly',
                         className='form-control mt-2',
-                        
-    style={
-        'backgroundColor': '#2c2c2c',
-        'color': '#ffffff',
-        'borderColor': '#4d4d4d'
-    }
+                        style={
+                            'backgroundColor': '#2c2c2c',
+                            'color': '#ffffff',
+                            'borderColor': '#4d4d4d',
+                        }
                     )
-                ], className='card-content')
-            ], className='single-card-wrapper')
-        ], width=3, ),
+                ], className='card-content', style={'overflow': 'visible'}),
+            ], className='single-card-wrapper', style={'overflow': 'visible'}),
+        ], width=3, style={'overflow': 'visible'}),
         dbc.Col([
             html.Div(id='disease-link')  # Added the container here
         ], width=8)
@@ -210,7 +209,7 @@ def search_disease(n_clicks, disease_name):
         print(trigger_id)
         print(n_clicks)
         if trigger_id == 'search-button.n_clicks' and n_clicks > 0:
-            disease_data_url = f"http://localhost:5552/dash/?disease_name={disease_name}"
+            disease_data_url = f"http://localhost:3000/"
             return html.A(href=disease_data_url, target="_blank", children="Open Disease Data")
         else:
             return None
