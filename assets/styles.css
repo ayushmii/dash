@@ -8,6 +8,29 @@
   --card-hover-color: #242444;
   --placeholder-color:#a9a9a9;
 }
+.custom-dropdown .Select-control {
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
+    border-color: #4d4d4d !important;
+}
+
+.custom-dropdown .Select-value {
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
+}
+
+.custom-dropdown .Select-placeholder {
+    color: #ffffff !important;
+}
+
+.custom-dropdown .Select-arrow-zone .Select-arrow {
+    border-top-color: #ffffff !important;
+}
+
+.custom-dropdown .Select-clear-zone .Select-clear {
+    color: #ffffff !important;
+}
+
 .form-control::placeholder {
   color: var(--placeholder-color); /* or any other desired color */
 }
@@ -23,19 +46,37 @@ body {
 .header-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* Changed from 'center' to 'space-between' */
+
   background-color: var(--primary-color);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+.fixed-image {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
 
+.fixed-image:hover {
+  transform: scale(1.2);
+}
 .form-control {
+  height: 2.5rem;
   background-color: var(--background-color);
   color: var(--text-color);
   border-color: var(--primary-color);
 }
 
+
+.is-open .card-hover-container:hover {
+  transform: none !important;
+  box-shadow: none;
+}
+
+.is-open .card-bg-characters {
+  opacity: 0 !important;
+}
 .searchbutton {
   background-color: var(--primary-color);
   color: var(--text-color);
@@ -45,11 +86,53 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
 }
+.container{ /* Changed from 'center' to 'space-between' */
 
-.searchbutton:hover {
-  background-color: var(--accent-color);
+  background-color: var(--primary-color);
+ 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+/* Center the entire card content horizontally within the column */
+.justify-content-center {
+  justify-content: center !important; 
 }
 
+/* Center the text horizontally within the inner div */
+.d-flex {
+  display: flex !important;
+}
+
+.justify-content-center {
+  justify-content: center !important;
+}
+
+.Select-Control{
+  position: relative !important; 
+  z-index: 9999 !important;
+}
+/* Styles for the card content div */
+.card-content {
+  position: relative;
+  overflow: visible;
+  /* Add any additional styles for the card content here */
+}
+
+.h3-center{
+text-align: center;
+}
+.DateInput_input {
+  background-color: #1c1c1c !important;
+  color: #ffffff !important;
+   border-color: #1c1c1c !important; 
+   
+  padding:0 !important;
+}
+.DateRangePickerInput {
+  justify-content: center !important;
+  background-color: #000;
+  display: inline-block;
+  border-color: #000;
+}
 .logo {
   max-height: 80px;
   padding-right: 20px;
@@ -61,7 +144,6 @@ body {
 .DateInput_input {
   background-color: #1c1c1c !important;
   color: #ffffff !important;
-  border-color: #4d4d4d !important;
 }
 .header-title {
   font-size: 2.5rem;
@@ -70,8 +152,11 @@ body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin: 0;
 }
-
+.card-value {
+  font-size: 4rem !important;
+}
 .single-card-wrapper:hover {
+  z-index: 1;
   background-color: var(--primary-color);
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -83,6 +168,18 @@ body {
   overflow: hidden;
 }
 
+.single-card-wrapper2:hover {
+  z-index: 1;
+  background-color: var(--primary-color);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.single-card-wrapper2 {
+  margin-bottom: 20px !important;
+  border-radius: 10px;
+  overflow: hidden;
+}
 .card-hover-container {
   border: 0.5px solid #ffffff1e !important;
   border-radius: 26px !important;
@@ -139,18 +236,40 @@ body {
 .card-content {
   color: var(--text-color) !important;
   position: relative !important;
-  z-index: 4 !important;
   text-align: center !important;
   padding: 20px !important;
 }
-
+h3{
+  color: var(--text-color) !important;
+}
 .card-content h3 {
   font-size: 24px !important;
   margin-bottom: 10px !important;
 }
 
 .card-content p {
-  font-size: 18px !important;
+  font-size: 42px !important;
+  font-weight: bold !important;
+  margin: 0 !important;
+}
+.row-center{
+  justify-content: center;
+}
+.card-content-2 {
+  z-index: 4 !important;
+  color: var(--text-color) !important;
+  position: relative !important;
+  text-align: center !important;
+  padding: 20px !important;
+}
+
+.card-content-2 h3 {
+  font-size: 24px !important;
+  margin-bottom: 10px !important;
+}
+
+.card-content-2 p {
+  font-size: 42px !important;
   font-weight: bold !important;
   margin: 0 !important;
 }
@@ -161,6 +280,24 @@ body {
   flex-wrap: wrap;
   justify-content: space-between;
 }
+
+.card-wrapper .single-card-wrapper2 {
+  width: 32%;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .card-wrapper .single-card-wrapper2 {
+    width: 49%;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-wrapper .single-card-wrapper2 {
+    width: 100%;
+  }
+}
+
 
 .card-wrapper .single-card-wrapper {
   width: 32%;
@@ -203,6 +340,24 @@ body {
   transition: visibility 0.2s, opacity 0.2s linear;
 }
 
+body.dropdown-open .single-card-wrapper {
+  transition: none;
+  background-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+body.dropdown-open .single-card-wrapper2 {
+  transition: none;
+  background-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
 .VirtualizedSelectOption {
   color: black !important;
+}
+
+#grouping {
+  z-index: 1000 !important;
 }

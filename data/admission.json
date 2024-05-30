@@ -1,0 +1,154 @@
+{
+  "admissions": [
+    {
+      "patient_id": "P001",
+      "admission_date": "2014-01-05",
+      "discharge_date": "2014-01-10"
+    },
+    {
+      "patient_id": "P002",
+      "admission_date": "2014-02-12",
+      "discharge_date": "2014-02-15"
+    },
+    {
+      "patient_id": "P003",
+      "admission_date": "2014-03-21",
+      "discharge_date": "2014-03-25"
+    },
+    {
+      "patient_id": "P004",
+      "admission_date": "2014-04-01",
+      "discharge_date": "2014-04-05"
+    },
+    {
+      "patient_id": "P005",
+      "admission_date": "2014-05-09",
+      "discharge_date": "2014-05-14"
+    },
+    {
+      "patient_id": "P006",
+      "admission_date": "2014-06-18",
+      "discharge_date": "2014-06-22"
+    },
+    {
+      "patient_id": "P007",
+      "admission_date": "2014-07-03",
+      "discharge_date": "2014-07-08"
+    },
+    {
+      "patient_id": "P008",
+      "admission_date": "2014-08-11",
+      "discharge_date": "2014-08-16"
+    },
+    {
+      "patient_id": "P009",
+      "admission_date": "2014-09-25",
+      "discharge_date": "2014-09-30"
+    },
+    {
+      "patient_id": "P010",
+      "admission_date": "2014-10-03",
+      "discharge_date": "2014-10-07"
+    },
+    {
+      "patient_id": "P011",
+      "admission_date": "2014-11-08",
+      "discharge_date": "2014-11-13"
+    },
+    {
+      "patient_id": "P012",
+      "admission_date": "2014-12-17",
+      "discharge_date": "2014-12-22"
+    },
+    {
+      "patient_id": "P013",
+      "admission_date": "2015-01-19",
+      "discharge_date": "2015-01-24"
+    },
+    {
+      "patient_id": "P014",
+      "admission_date": "2015-02-25",
+      "discharge_date": "2015-03-01"
+    },
+    {
+      "patient_id": "P015",
+      "admission_date": "2015-03-03",
+      "discharge_date": "2015-03-07"
+    },
+    {
+      "patient_id": "P016",
+      "admission_date": "2015-04-10",
+      "discharge_date": "2015-04-15"
+    },
+    {
+      "patient_id": "P017",
+      "admission_date": "2015-05-16",
+      "discharge_date": "2015-05-20"
+    },
+    {
+      "patient_id": "P018",
+      "admission_date": "2015-06-21",
+      "discharge_date": "2015-06-25"
+    },
+    {
+      "patient_id": "P019",
+      "admission_date": "2015-07-02",
+      "discharge_date": "2015-07-06"
+    },
+    {
+      "patient_id": "P020",
+      "admission_date": "2015-08-12",
+      "discharge_date": "2015-08-16"
+    },
+    {
+      "patient_id": "P021",
+      "admission_date": "2015-09-19",
+      "discharge_date": "2015-09-23"
+    },
+    {
+      "patient_id": "P022",
+      "admission_date": "2015-10-25",
+      "discharge_date": "2015-10-29"
+    },
+    {
+      "patient_id": "P023",
+      "admission_date": "2015-11-08",
+      "discharge_date": "2015-11-12"
+    },
+    {
+      "patient_id": "P024",
+      "admission_date": "2015-12-15",
+      "discharge_date": "2015-12-20"
+    },
+    {
+      "patient_id": "P025",
+      "admission_date": "2016-01-17",
+      "discharge_date": "2016-01-21"
+    },
+    {
+      "patient_id": "P026",
+      "admission_date": "2016-02-24",
+      "discharge_date": "2016-02-28"
+    },
+    {
+      "patient_id": "P027",
+      "admission_date": "2016-03-03",
+      "discharge_date": "2016-03-08"
+    },
+    {
+      "patient_id": "P028",
+      "admission_date": "2016-04-11",
+      "discharge_date": "2016-04-16"
+    },
+    {
+      "patient_id": "P029",
+      "admission_date": "2016-05-16",
+      "discharge_date": "2016-05-21"
+    },
+    {
+      "patient_id": "P030",
+      "admission_date": "2016-06-19",
+      "discharge_date": "2016-06-23"
+    }
+  ]
+}

@@ -1,27 +1,22 @@
-from flask import Flask, request, jsonify,abort
+from flask import Flask, request, jsonify, abort
 import os
-import psycopg2
+import cx_Oracle
 import requests
-from flask import Blueprint, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-load_dotenv()  # take environment variables from .env.
+load_dotenv()  # Load environment variables from .env.
 
 app = Flask(__name__)
 CORS(app)
+
 # Database connection
-conn = psycopg2.connect(
-    host="localhost",
-    database="pgi_data",
-    user="ayush",
-    password="aysh7139"
-)
+oracle_dsn = cx_Oracle.makedsn("localhost", "1521", service_name="orclpdb1")
+conn = cx_Oracle.connect(user="ayush", password="aysh7139", dsn=oracle_dsn)
 cur = conn.cursor()
 
 @app.route('/patient_counts', methods=['GET'])
 def get_patient_counts():
-    # Get parameters from the request
     dept_names = request.args.get('dept_names', '').split(',')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
@@ -32,7 +27,7 @@ def get_patient_counts():
         SELECT
             CASE WHEN col1 IN ('ENCOUNTER', 'VISIT') THEN 'ENCOUNTER_VISIT' ELSE col1 END AS col1_modified,
             dept,
-            DATE_TRUNC(%s, data_date) AS data_date,
+            TRUNC(data_date, :grouping) AS data_date,
             MIN(data_date) AS data_from,
             MAX(data_date) AS data_upto,
             COUNT(*) AS rec_count,
@@ -41,36 +36,29 @@ def get_patient_counts():
         FROM
             M_PATIENT_COUNTS
         WHERE
-            data_date BETWEEN %s AND %s
-            AND (SELECT d.department_name FROM HISDEPARTMENT d WHERE d.department_id = M_PATIENT_COUNTS.dept) IN %s
+            data_date BETWEEN TO_DATE(:start_date, 'YYYY-MM-DD') AND TO_DATE(:end_date, 'YYYY-MM-DD')
+            AND (SELECT d.department_name FROM HISDEPARTMENT d WHERE d.department_id = M_PATIENT_COUNTS.dept) IN (:dept_names)
         GROUP BY
             CASE WHEN col1 IN ('ENCOUNTER', 'VISIT') THEN 'ENCOUNTER_VISIT' ELSE col1 END,
             dept,
-            DATE_TRUNC(%s, data_date)
+            TRUNC(data_date, :grouping)
         ORDER BY
-            dept, col1_modified;
+            dept, col1_modified
     """
 
     # Prepare the grouping function and clause based on the grouping parameter
-    if grouping == 'monthly':
-        grouping_func = 'month'
-    elif grouping == 'yearly':
-        grouping_func = 'year'
-    elif grouping == 'weekly':
-        grouping_func = 'week'
-    else:
+    grouping_func = 'MONTH' if grouping == 'monthly' else 'YEAR' if grouping == 'yearly' else 'WEEK' if grouping == 'weekly' else None
+    if not grouping_func:
         return jsonify({'error': 'Invalid grouping parameter'}), 400
 
-    print(query)
-    print(f"{grouping_func} {start_date} {end_date} {tuple(dept_names)} {grouping_func}")
+    cur.execute(query, {
+        'grouping': grouping_func,
+        'start_date': start_date,
+        'end_date': end_date,
+        'dept_names': tuple(dept_names)
+    })
 
-    # Execute the query
-    cur.execute(query, (grouping_func, start_date, end_date, tuple(dept_names), grouping_func))
-
-    # Execute the query
     rows = cur.fetchall()
-
-    # Convert the result to a list of dictionaries
     data = [
         {
             'col1': row[0],
@@ -86,18 +74,15 @@ def get_patient_counts():
     ]
 
     return jsonify(data)
-import json 
+
+import json
 
 @app.route('/get-json/<filename>', methods=['GET'])
 def get_json(filename):
-    # Construct the full file path
     file_path = os.path.join('data', filename)
-    
-    # Check if the file exists and is a file
     if not os.path.isfile(file_path):
         abort(404, description=f"File {filename} not found")
 
-    # Read the JSON file
     try:
         with open(file_path, 'r') as file:
             data = json.load(file)
@@ -106,40 +91,27 @@ def get_json(filename):
     except Exception as e:
         abort(500, description=f"Error reading {filename}: {str(e)}")
     
-    # Return the JSON data as response
     return jsonify(data)
+
 @app.route('/departments', methods=['GET'])
 def get_department_names():
     try:
-        # Execute the SQL query to retrieve department names
         cur.execute("SELECT department_name FROM HISDEPARTMENT")
-
-        # Fetch all rows
         rows = cur.fetchall()
-
-        # Extract department names from the result
         department_names = [row[0] for row in rows]
-
-        # Return department names as JSON response
         return jsonify(department_names)
-
-    except psycopg2.Error as e:
-        # Handle database errors
+    except cx_Oracle.DatabaseError as e:
         error_message = "Database error: {}".format(e)
         return jsonify({"error": error_message}), 500
-
     except Exception as e:
-        # Handle other exceptions
         error_message = "Error: {}".format(e)
         return jsonify({"error": error_message}), 500
-
 
 @app.route('/disease_counts', methods=['GET'])
 def get_disease_counts():
     disease_name = request.args.get('disease_name')
-    date_from=request.args.get('date_from')
-    date_to=request.args.get('date_to')
-    print(disease_name)
+    date_from = request.args.get('date_from')
+    date_to = request.args.get('date_to')
     if not disease_name:
         return jsonify({'error': 'Disease name is required'}), 400
 
@@ -163,54 +135,40 @@ def get_synonyms(disease_name):
         if 'result' in data and 'results' in data['result']:
             for result in data['result']['results']:
                 if 'name' in result and result['name'] != disease_name:
-                    print(result['name'])
                     synonyms.append(result['name'])
         return synonyms
     else:
-        print(f"Failed to fetch synonyms for '{disease_name}': {response.status_code} - {response.text}")
         return []
-    
-#The Count credentials for this database will be different.
-#Two option: Postgres or Oracle
-#Make Connection options dynamic
 
 def construct_query(disease_name, synonyms):
-    # Prepare the disease name and synonyms for use in the query
     disease_name_pattern = f"%{disease_name.lower().replace(' ', '')}%"
     synonym_patterns = [f"%{syn.lower().replace(' ', '')}%" for syn in synonyms]
 
-    # Construct the query with dynamic parameters
     query = """
-            SELECT  count(*) AS visits,23 as patients,9 as discharge_summaries ,4 as ds_patients 
-            FROM disease_record
-            WHERE
-                LOWER(REPLACE(disease_name, ' ', '')) LIKE %s
-                OR LOWER(REPLACE(disease_desc, ' ', '')) LIKE %s
-            
-        """
+        SELECT COUNT(*) AS visits, 23 AS patients, 9 AS discharge_summaries, 4 AS ds_patients
+        FROM disease_record
+        WHERE
+            LOWER(REPLACE(disease_name, ' ', '')) LIKE :disease_name_pattern
+            OR LOWER(REPLACE(disease_desc, ' ', '')) LIKE :disease_name_pattern
+    """
 
-    # Add additional condition for synonyms
     if synonym_patterns:
-        synonym_conditions = " OR ".join([f"LOWER(REPLACE(disease_desc, ' ', '')) LIKE %s" for _ in synonym_patterns])
-        query += f"    OR ({synonym_conditions})"
+        synonym_conditions = " OR ".join([f"LOWER(REPLACE(disease_desc, ' ', '')) LIKE :syn_{i}" for i in range(len(synonym_patterns))])
+        query += f" OR ({synonym_conditions})"
     
-    params = [disease_name_pattern, disease_name_pattern] + synonym_patterns
-    
+    params = {'disease_name_pattern': disease_name_pattern}
+    for i, pattern in enumerate(synonym_patterns):
+        params[f'syn_{i}'] = pattern
+
     return query, params
 
 def execute_query(query, params):
-    conn = psycopg2.connect(
-        host="localhost",
-        database="pgi_data",
-        user="ayush",
-        password="aysh7139"
-    )
+    conn = cx_Oracle.connect(user="ayush", password="aysh7139", dsn=oracle_dsn)
     cursor = conn.cursor()
     cursor.execute(query, params)
     results = cursor.fetchall()
     conn.close()
-    return [dict((cursor.description[i][0], value) \
-                 for i, value in enumerate(row)) for row in results]
+    return [dict((cursor.description[i][0], value) for i, value in enumerate(row)) for row in results]
 
 if __name__ == '__main__':
     app.run(port=5585, debug=True)

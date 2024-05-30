@@ -1,0 +1,96 @@
+{
+    "departments": [
+      {
+        "department_name": "Surgical Gastroenterology",
+        "prescription_count": [
+          {"month": "May2015", "count": 180},
+          {"month": "June2015", "count": 185},
+          {"month": "July2015", "count": 190},
+          {"month": "August2015", "count": 195},
+          {"month": "September2015", "count": 200},
+          {"month": "October2015", "count": 205},
+          {"month": "November2015", "count": 210},
+          {"month": "December2015", "count": 215},
+          {"month": "January2016", "count": 220},
+          {"month": "February2016", "count": 215},
+          {"month": "March2016", "count": 210},
+          {"month": "April2016", "count": 205},
+          {"month": "May2016", "count": 200}
+        ]
+      },
+      {
+        "department_name": "Paediatric Gastroenterology",
+        "prescription_count": [
+          {"month": "May2015", "count": 170},
+          {"month": "June2015", "count": 165},
+          {"month": "July2015", "count": 160},
+          {"month": "August2015", "count": 155},
+          {"month": "September2015", "count": 150},
+          {"month": "October2015", "count": 145},
+          {"month": "November2015", "count": 140},
+          {"month": "December2015", "count": 135},
+          {"month": "January2016", "count": 130},
+          {"month": "February2016", "count": 135},
+          {"month": "March2016", "count": 140},
+          {"month": "April2016", "count": 145},
+          {"month": "May2016", "count": 150}
+        ]
+      },
+      {
+        "department_name": "Gastroenterology",
+        "prescription_count": [
+          {"month": "May2015", "count": 210},
+          {"month": "June2015", "count": 215},
+          {"month": "July2015", "count": 220},
+          {"month": "August2015", "count": 225},
+          {"month": "September2015", "count": 230},
+          {"month": "October2015", "count": 235},
+          {"month": "November2015", "count": 240},
+          {"month": "December2015", "count": 245},
+          {"month": "January2016", "count": 250},
+          {"month": "February2016", "count": 255},
+          {"month": "March2016", "count": 260},
+          {"month": "April2016", "count": 265},
+          {"month": "May2016", "count": 270}
+        ]
+      },
+      {
+        "department_name": "Hematology",
+        "prescription_count": [
+          {"month": "May2015", "count": 280},
+          {"month": "June2015", "count": 285},
+          {"month": "July2015", "count": 290},
+          {"month": "August2015", "count": 295},
+          {"month": "September2015", "count": 300},
+          {"month": "October2015", "count": 305},
+          {"month": "November2015", "count": 310},
+          {"month": "December2015", "count": 315},
+          {"month": "January2016", "count": 320},
+          {"month": "February2016", "count": 325},
+          {"month": "March2016", "count": 330},
+          {"month": "April2016", "count": 335},
+          {"month": "May2016", "count": 340}
+        ]
+      },
+      {
+        "department_name": "Hepatology",
+        "prescription_count": [
+          {"month": "May2015", "count": 190},
+          {"month": "June2015", "count": 185},
+          {"month": "July2015", "count": 180},
+          {"month": "August2015", "count": 175},
+          {"month": "September2015", "count": 170},
+          {"month": "October2015", "count": 165},
+          {"month": "November2015", "count": 160},
+          {"month": "December2015", "count": 155},
+          {"month": "January2016", "count": 150},
+          {"month": "February2016", "count": 155},
+          {"month": "March2016", "count": 160},
+          {"month": "April2016", "count": 165},
+          {"month": "May2016", "count": 170}
+        ]
+      }
+      
+    ]
+  }
+  

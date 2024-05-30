@@ -1,43 +1,150 @@
+/* Define color variables */
 
+:root {
+  --primary-color: #7764a4; /* Deep purple */
+  --secondary-color: #a4b0ed; /* Light blue */
+  --accent-color: #6D41A1; /* Plum purple */
+  --background-color: #E0E0E0; /* Light grey */
+  --text-color: #333333; /* Dark grey */
+  --card-hover-color: #E0E0E0; /* Light grey (for hover effect) */
+  --placeholder-color: #BDBDBD; /* Light grey (for placeholders) */
+}
+
+/* Add background color to the body */
 body {
-  background-color: #30343e;
-  color: #fff;
+  background-color: black; /* Set the background of the entire screen to black */
+  color: var(--text-color); /* Set text color */
+  font-family: 'Roboto', sans-serif; /* Set font family */
+
+}
+html, body {
+  background-color: rgb(196, 186, 205);
 }
 
-.table {
-  color: #fff;
+/* Material-UI styles */
+.MuiContainer-root {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 20px;
+  width: 100%; /* Ensure the container takes up the full width */
+  max-width: none; /* Remove any maximum width restriction */
+  margin-left: 0; /* Remove left margin */
+  margin-right: 0; /* Remove right margin */
 }
 
-.table th {
-  background-color: #3c4048;
+.table.table-striped {
+  table-layout: fixed;
+}
+
+.table.table-striped th, 
+.table.table-striped td {
+  
+  padding: 8px;
+}
+
+.table.table-striped th:first-child,
+.table.table-striped td:first-child {
+  text-align: left;
+  width: 20%; /* Adjust the width as needed for the first column */
+}
+
+.table.table-striped th:not(:first-child),
+.table.table-striped td:not(:first-child) {
+  text-align: right;
+  width: calc(80% /4); /* Adjust the calculation according to the number of columns */
+}
+
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
+i[data-tooltip]::after {
+  content: attr(data-tooltip);
+  width: max-content;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+  transform: scale(0);
+  transition: 0.2s ease-in-out;
+}
+
+i[data-tooltip]:hover::after {
+  transform: scale(1);
+  bottom: -150%;
 }
 
 
-
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #373b42;
+.MuiInputBase-root {
+  height: 50px; /* Adjust the height as needed */
 }
 
-.table-striped tbody tr:nth-of-type(even) {
-  background-color: #282c34;
+.MuiOutlinedInput-root {
+  height: 100%; /* Ensure the input box takes up the full height */
 }
 
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
+
+.MuiPaper-root {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
 }
 
-.btn-primary:hover {
-  background-color: #0069d9;
-  border-color: #0062cc;
+.MuiButton-root {
+  margin: 8px;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border-radius: 5px;
+  transition: all 0.3s ease;
 }
 
-.modal-content {
-  background-color: #373b42;
-  color: #fff;
+.MuiButton-root:hover {
+  background-color: var(--accent-color);
+  transform: scale(1.05);
 }
 
-.modal-header,
-.modal-footer {
-  border-color: #3c4048;
+.MuiTable-root {
+  background-color: var(--background-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.MuiTableHead-root {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.MuiTableRow-root:nth-of-type(odd) {
+  background-color: var(--card-hover-color);
+}
+
+.MuiInputBase-root {
+  color: var(--text-color);
+  background-color: var(--background-color);
+  border-color: var(--primary-color);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.MuiInputBase-input::placeholder {
+  color: var(--placeholder-color);
+}
+
+.MuiInputBase-root:hover {
+  border-color: var(--accent-color);
+}
+
+/* Additional styles */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-color);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .MuiContainer-root {
+    padding: 10px;
+  }
 }

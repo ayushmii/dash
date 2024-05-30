@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,abort
 import os
 import psycopg2
 import requests
@@ -28,20 +28,27 @@ def get_patient_counts():
     grouping = request.args.get('grouping', 'monthly')  # Default to monthly
 
     # Prepare the SQL query
-    # Prepare the SQL query
     query = """
-        SELECT col1, dept, 
+        SELECT
+            CASE WHEN col1 IN ('ENCOUNTER', 'VISIT') THEN 'ENCOUNTER_VISIT' ELSE col1 END AS col1_modified,
+            dept,
             DATE_TRUNC(%s, data_date) AS data_date,
             MIN(data_date) AS data_from,
             MAX(data_date) AS data_upto,
             COUNT(*) AS rec_count,
             COUNT(DISTINCT deidpref) AS patient_count,
             (SELECT d.department_name FROM HISDEPARTMENT d WHERE d.department_id = M_PATIENT_COUNTS.dept) AS dept_name
-        FROM M_PATIENT_COUNTS
-        WHERE data_date BETWEEN %s AND %s
+        FROM
+            M_PATIENT_COUNTS
+        WHERE
+            data_date BETWEEN %s AND %s
             AND (SELECT d.department_name FROM HISDEPARTMENT d WHERE d.department_id = M_PATIENT_COUNTS.dept) IN %s
-        GROUP BY col1, dept, DATE_TRUNC(%s, data_date)
-        ORDER BY dept, col1;
+        GROUP BY
+            CASE WHEN col1 IN ('ENCOUNTER', 'VISIT') THEN 'ENCOUNTER_VISIT' ELSE col1 END,
+            dept,
+            DATE_TRUNC(%s, data_date)
+        ORDER BY
+            dept, col1_modified;
     """
 
     # Prepare the grouping function and clause based on the grouping parameter
@@ -54,12 +61,13 @@ def get_patient_counts():
     else:
         return jsonify({'error': 'Invalid grouping parameter'}), 400
 
+    print(query)
+    print(f"{grouping_func} {start_date} {end_date} {tuple(dept_names)} {grouping_func}")
+
     # Execute the query
     cur.execute(query, (grouping_func, start_date, end_date, tuple(dept_names), grouping_func))
 
-
     # Execute the query
-    
     rows = cur.fetchall()
 
     # Convert the result to a list of dictionaries
@@ -78,7 +86,28 @@ def get_patient_counts():
     ]
 
     return jsonify(data)
+import json 
 
+@app.route('/get-json/<filename>', methods=['GET'])
+def get_json(filename):
+    # Construct the full file path
+    file_path = os.path.join('data', filename)
+    
+    # Check if the file exists and is a file
+    if not os.path.isfile(file_path):
+        abort(404, description=f"File {filename} not found")
+
+    # Read the JSON file
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+    except json.JSONDecodeError:
+        abort(400, description=f"File {filename} is not a valid JSON")
+    except Exception as e:
+        abort(500, description=f"Error reading {filename}: {str(e)}")
+    
+    # Return the JSON data as response
+    return jsonify(data)
 @app.route('/departments', methods=['GET'])
 def get_department_names():
     try:

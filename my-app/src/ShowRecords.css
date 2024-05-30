@@ -1,0 +1,54 @@
+/* fonts.css */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+:root {
+    --primary-color: #7764a4; /* Deep purple */
+    --secondary-color: #a4b0ed; /* Light blue */
+    --accent-color: #6D41A1; /* Plum purple */
+    --background-color: #E0E0E0; /* Light grey */
+    --text-color: #333333; /* Dark grey */
+    --card-hover-color: #E0E0E0; /* Light grey (for hover effect) */
+    --placeholder-color: #BDBDBD; /* Light grey (for placeholders) */
+  }
+  .refresh-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .refresh-button:hover {
+    background-color: var(--secondary-color)
+  }
+  
+  .refresh-button .material-symbols-outlined {
+    margin-right: 8px;
+  }
+.download-button {
+    margin-right: 12px !important ;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-color);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 7px 7px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .download-button:hover {
+    background-color: #6D41A1;
+  }
+  
+  .download-button .material-symbols-outlined {
+    margin-right: 8px;
+  }

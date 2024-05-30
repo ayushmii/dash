@@ -1,0 +1,104 @@
+{
+  "departments": [
+    {
+      "cg_type": "Physicians",
+      "count": 8,
+      "department_name": "Surgical Gastroenterology"
+    },
+    {
+      "cg_type": "Physicians",
+      "count": 15,
+      "department_name": "Paediatric Gastroenterology"
+    },
+    {
+      "cg_type": "Physicians",
+      "count": 3,
+      "department_name": "Gastroenterology"
+    },
+    {
+      "cg_type": "Physicians",
+      "count": 10,
+      "department_name": "Hematology"
+    },
+    {
+      "cg_type": "Physicians",
+      "count": 5,
+      "department_name": "Hepatology"
+    },
+    {
+      "cg_type": "Technicians",
+      "count": 9,
+      "department_name": "Surgical Gastroenterology"
+    },
+    {
+      "cg_type": "Technicians",
+      "count": 13,
+      "department_name": "Paediatric Gastroenterology"
+    },
+    {
+      "cg_type": "Technicians",
+      "count": 17,
+      "department_name": "Gastroenterology"
+    },
+    {
+      "cg_type": "Technicians",
+      "count": 14,
+      "department_name": "Hematology"
+    },
+    {
+      "cg_type": "Technicians",
+      "count": 12,
+      "department_name": "Hepatology"
+    },
+    {
+      "cg_type": "Nursing Staff",
+      "count": 22,
+      "department_name": "Surgical Gastroenterology"
+    },
+    {
+      "cg_type": "Nursing Staff",
+      "count": 7,
+      "department_name": "Paediatric Gastroenterology"
+    },
+    {
+      "cg_type": "Nursing Staff",
+      "count": 19,
+      "department_name": "Gastroenterology"
+    },
+    {
+      "cg_type": "Nursing Staff",
+      "count": 11,
+      "department_name": "Hematology"
+    },
+    {
+      "cg_type": "Nursing Staff",
+      "count": 16,
+      "department_name": "Hepatology"
+    },
+    {
+      "cg_type": "Administrative Staff",
+      "count": 24,
+      "department_name": "Surgical Gastroenterology"
+    },
+    {
+      "cg_type": "Administrative Staff",
+      "count": 2,
+      "department_name": "Paediatric Gastroenterology"
+    },
+    {
+      "cg_type": "Administrative Staff",
+      "count": 21,
+      "department_name": "Gastroenterology"
+    },
+    {
+      "cg_type": "Support Staff",
+      "count": 4,
+      "department_name": "Hematology"
+    },
+    {
+      "cg_type": "Support Staff",
+      "count": 1,
+      "department_name": "Hepatology"
+    }
+  ]
+}
