@@ -275,7 +275,7 @@ dash_app.layout = dbc.Container([
                     className="fixed-image",
                     style={"width": "100px", "transition": "transform 0.3s ease"},
                 ),
-                href="https://www.example.com",  # Replace with the desired URL
+                href="localhost:3000",  # Replace with the desired URL
                 target="_blank",
                 style={"position": "fixed", "bottom": "40px", "right": "40px", "zIndex": "9999"},
             )
