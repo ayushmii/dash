@@ -5,7 +5,7 @@ import sys
 # List of server commands
 servers = [
     "python queryserver.py",
-    "python diseasapp.py",
+    "python diseaseapp.py",
     "python patient_count.py",
     "python patient_count_stack.py",
     "python dashboard.py"
