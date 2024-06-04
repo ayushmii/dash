@@ -1,7 +1,7 @@
 /* Define color variables */
 :root {
   --primary-color: #1d1236;
-  --secondary-color: #52b7e9;
+  --secondary-color: #c293ec;
   --accent-color: #6d41a1;
   --background-color: #000000;
   --text-color: #ffffff;
@@ -10,6 +10,97 @@
 }
 .dash-debug-menu__outer, .dash-debug-menu {
   display: none !important;
+}
+/* Modal styles */
+.btn{
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+}
+.selected-filters-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-box {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 10px 20px;
+  margin: 0 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  border: 1px solid #333333;
+  transition: transform 0.3s ease;
+}
+
+.filter-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px #d0ced366;
+}
+.modal-content {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: var(--text-color);
+}
+
+.modal-header {
+  border-bottom: none;
+  padding: 20px;
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  border-top: none;
+  padding: 20px;
+}
+
+.modal-footer .btn-primary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.modal-footer .btn-secondary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.selected-filters {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: var(--text-color);
+  padding: 10px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 .custom-dropdown .Select-control {
     background-color: #2c2c2c !important;

@@ -44,11 +44,43 @@ dash_app.layout = dbc.Container([
                     html.Img(src="assets/logo.png", className="logo"),
                     html.H1("Sanjay Gandhi Postgraduate Institute of Medical Sciences", className="header-title")
                 ], className="header-container", style={
-                    'border-radius': '10px'
+                    'border-radius': '20px'
                 })
             ], width=12)
         ]),
-    ]),html.Div(id='selected-filters', style={'color': 'white', 'fontSize': '18px', 'textAlign': 'center'}),
+    ]),
+dbc.Row([
+    dbc.Col([
+        html.Div(
+            id='selected-filters',
+            className='selected-filters-container',
+            style={
+                'color': '#ffffff',
+                'fontSize': '18px',
+                'textAlign': 'center',
+                'backgroundColor': '#1a1a1a',
+                'padding': '15px',
+                'borderRadius': '8px',
+                'marginTop': '20px',
+                'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.4)',
+                'border': '1px solid #333333',
+                'height': '100%'
+            }
+        )
+    ], width=12),
+    dbc.Col([
+        dbc.Button(
+            "Open Filters",
+            id="open-modal-button",
+            n_clicks=0,
+            style={
+                'position': 'absolute',
+                'bottom': '2px',
+                'right': '20px'
+            }
+        )
+    ], width=12, style={'position': 'relative', 'height': '0'})
+]),html.Div([]),
     dbc.Modal(
     [
         dbc.ModalHeader("Filters"),
@@ -101,11 +133,11 @@ dash_app.layout = dbc.Container([
     ],
     id="modal",
     is_open=False,
-),dbc.Button("Open Filters", id="open-modal-button", n_clicks=0),
+),
     # Cards for patient count, visits, and admissions
     dbc.Row([
         dbc.Col([
-            html.H3("Patient Statistics", style={"color": "white"}),
+            html.H3("Patient Statistics", style={"color": "white",'marginTop': '20px'}),
         ], width=12),
     ]),
     dbc.Row([
@@ -386,6 +418,7 @@ def toggle_modal(n1, n2, is_open):
         return not is_open
     return is_open
 
+
 @dash_app.callback(
     Output('selected-month-store', 'data'),
     Input('lab-orders-chart', 'clickData')
@@ -397,22 +430,19 @@ def update_selected_month(click_data):
     else:
         return ''
 # Callback functions
-
 @dash_app.callback(
     [
         Output('lab-orders-chart', 'figure'),
         Output('lab-orders-dept-chart', 'figure')
     ],
-    [ Input('dept-filter', 'value'), Input('date-range-filter', 'start_date'), Input('date-range-filter', 'end_date'), Input('grouping', 'value'),Input('selected-month-store', 'data')]
+    [Input('dept-filter', 'value'), Input('date-range-filter', 'start_date'), Input('date-range-filter', 'end_date'), Input('grouping', 'value'), Input('lab-orders-chart', 'clickData')]
 )
-def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_month):
+def update_charts_lab(selected_depts, start_date, end_date, grouping, click_data):
     if 'all' in selected_depts:
         dept_names = ','.join(requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/departments").json())
     else:
         dept_names = ','.join(selected_depts)
 
-    prescription_data = requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/get-json/prescription.json").json()["departments"]
-    
     start_date = datetime.fromisoformat(start_date).strftime('%Y-%m-%d')
     end_date = datetime.fromisoformat(end_date).strftime('%Y-%m-%d')
 
@@ -427,16 +457,17 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_mo
     ])
     overall_lab_orders = overall_lab_orders.groupby("month")["count"].sum().reset_index()
 
-    # Sort overall lab orders data by month
-    overall_lab_orders['month'] = pd.to_datetime(overall_lab_orders['month'])
-    overall_lab_orders = overall_lab_orders.sort_values('month')
-
     # Prepare department-wise lab orders data
     dept_lab_orders = pd.DataFrame([
         {"department_name": dept["department_name"], "month": entry["month"], "count": entry["count"]}
         for dept in lab_orders_data
         for entry in dept["lab_orders"]
     ])
+
+    selected_month = None
+    if click_data:
+        selected_month = click_data['points'][0]['x']
+        selected_month = pd.to_datetime(selected_month).strftime('%Y-%m')
 
     # Create the overall lab orders chart
     lab_orders_chart = go.Figure()
@@ -455,16 +486,16 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_mo
         xaxis_gridcolor='rgba(51, 51, 51, 1)',
         yaxis_gridcolor='rgba(51, 51, 51, 1)'
     )
-    
-    if selected_month:
-        dept_lab_orders = dept_lab_orders[dept_lab_orders['month'] == selected_month]
-
-    # Sort department-wise lab orders data by month
-    dept_lab_orders['month'] = pd.to_datetime(dept_lab_orders['month'])
-    dept_lab_orders = dept_lab_orders.sort_values('month')
 
     # Create the department-wise lab orders chart
     lab_orders_dept_chart = go.Figure()
+    if selected_month:
+        dept_lab_orders = dept_lab_orders[dept_lab_orders['month'] == selected_month]
+
+    print(dept_lab_orders)
+    print("SELECTED MONTH")
+    print(selected_month)
+
     for dept_name, group in dept_lab_orders.groupby("department_name"):
         lab_orders_dept_chart.add_trace(go.Bar(
             x=group["month"],
@@ -519,10 +550,6 @@ def update_charts_pres(selected_depts, start_date, end_date, grouping, click_dat
     ])
     overall_prescriptions = overall_prescriptions.groupby("month")["count"].sum().reset_index()
 
-    # Sort overall prescriptions data by month
-    overall_prescriptions['month'] = pd.to_datetime(overall_prescriptions['month'])
-    overall_prescriptions = overall_prescriptions.sort_values('month')
-
     dept_prescriptions = pd.DataFrame([
         {"department_name": dept["department_name"], "month": entry["month"], "count": entry["count"]}
         for dept in prescription_data
@@ -532,6 +559,7 @@ def update_charts_pres(selected_depts, start_date, end_date, grouping, click_dat
     selected_month = None
     if click_data:
         selected_month = click_data['points'][0]['x']
+        selected_month = pd.to_datetime(selected_month).strftime('%Y-%m')
 
     # Create the overall prescriptions chart
     prescriptions_chart = go.Figure()
@@ -556,7 +584,15 @@ def update_charts_pres(selected_depts, start_date, end_date, grouping, click_dat
     if selected_month:
         dept_prescriptions = dept_prescriptions[dept_prescriptions["month"] == selected_month]
 
+    print(dept_prescriptions)
+    print("SELECTED")
+    print(selected_month)
+
     dept_counts = dept_prescriptions.groupby("department_name")["count"].sum().reset_index()
+
+    print("DEPARTMENT COUNTS")
+    print(dept_counts)
+
     prescriptions_dept_chart.add_trace(go.Pie(
         labels=dept_counts["department_name"],
         values=dept_counts["count"],
@@ -649,8 +685,11 @@ def update_selected_filters(selected_depts, start_date, end_date, grouping):
     start_date = datetime.fromisoformat(start_date).strftime('%d/%m/%Y')
     end_date = datetime.fromisoformat(end_date).strftime('%d/%m/%Y')
     
-    return f'Selected Filters: Departments: {dept_text} | Date Range: {start_date} - {end_date} | Grouping: {grouping.capitalize()}'
-
+    return html.Div([
+        html.Div(f'Departments: {dept_text}', className='filter-box'),
+        html.Div(f'Date Range: {start_date} - {end_date}', className='filter-box'),
+        html.Div(f'Grouping: {grouping.capitalize()}', className='filter-box')
+    ], className='selected-filters-container')
 @dash_app.callback(
     [
         Output('patient-count-chart', 'figure'),
@@ -706,7 +745,7 @@ def update_charts(n_clicks,selected_depts, start_date, end_date, grouping):
 
     # Admissions
     admissions_df = df[df['col1'] == 'ADMISSIONS']
-    print(admissions_df)
+    #print(admissions_df)
 
     admissions_chart = go.Figure()
 

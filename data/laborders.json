@@ -1,95 +1,94 @@
 {
-    "departments": [
-      {
-        "department_name": "Surgical Gastroenterology",
-        "lab_orders": [
-          {"month": "May2015", "count": 120},
-          {"month": "June2015", "count": 125},
-          {"month": "July2015", "count": 130},
-          {"month": "August2015", "count": 135},
-          {"month": "September2015", "count": 140},
-          {"month": "October2015", "count": 145},
-          {"month": "November2015", "count": 150},
-          {"month": "December2015", "count": 155},
-          {"month": "January2016", "count": 160},
-          {"month": "February2016", "count": 165},
-          {"month": "March2016", "count": 170},
-          {"month": "April2016", "count": 175},
-          {"month": "May2016", "count": 180}
-        ]
-      },
-      {
-        "department_name": "Paediatric Gastroenterology",
-        "lab_orders": [
-          {"month": "May2015", "count": 100},
-          {"month": "June2015", "count": 105},
-          {"month": "July2015", "count": 110},
-          {"month": "August2015", "count": 115},
-          {"month": "September2015", "count": 120},
-          {"month": "October2015", "count": 125},
-          {"month": "November2015", "count": 130},
-          {"month": "December2015", "count": 135},
-          {"month": "January2016", "count": 140},
-          {"month": "February2016", "count": 145},
-          {"month": "March2016", "count": 150},
-          {"month": "April2016", "count": 155},
-          {"month": "May2016", "count": 160}
-        ]
-      },
-      {
-        "department_name": "Gastroenterology",
-        "lab_orders": [
-          {"month": "May2015", "count": 150},
-          {"month": "June2015", "count": 155},
-          {"month": "July2015", "count": 160},
-          {"month": "August2015", "count": 165},
-          {"month": "September2015", "count": 170},
-          {"month": "October2015", "count": 175},
-          {"month": "November2015", "count": 180},
-          {"month": "December2015", "count": 185},
-          {"month": "January2016", "count": 190},
-          {"month": "February2016", "count": 195},
-          {"month": "March2016", "count": 200},
-          {"month": "April2016", "count": 205},
-          {"month": "May2016", "count": 210}
-        ]
-      },
-      {
-        "department_name": "Hematology",
-        "lab_orders": [
-          {"month": "May2015", "count": 80},
-          {"month": "June2015", "count": 85},
-          {"month": "July2015", "count": 90},
-          {"month": "August2015", "count": 95},
-          {"month": "September2015", "count": 100},
-          {"month": "October2015", "count": 105},
-          {"month": "November2015", "count": 110},
-          {"month": "December2015", "count": 115},
-          {"month": "January2016", "count": 120},
-          {"month": "February2016", "count": 125},
-          {"month": "March2016", "count": 130},
-          {"month": "April2016", "count": 135},
-          {"month": "May2016", "count": 140}
-        ]
-      },
-      {
-        "department_name": "Hepatology",
-        "lab_orders": [
-          {"month": "May2015", "count": 70},
-          {"month": "June2015", "count": 75},
-          {"month": "July2015", "count": 80},
-          {"month": "August2015", "count": 85},
-          {"month": "September2015", "count": 90},
-          {"month": "October2015", "count": 95},
-          {"month": "November2015", "count": 100},
-          {"month": "December2015", "count": 105},
-          {"month": "January2016", "count": 110},
-          {"month": "February2016", "count": 115},
-          {"month": "March2016", "count": 120},
-          {"month": "April2016", "count": 125},
-          {"month": "May2016", "count": 130}
-        ]
-      }
-    ]
-  }
-  
+  "departments": [
+    {
+      "department_name": "Surgical Gastroenterology",
+      "lab_orders": [
+        {"month": "2015-05", "count": 120},
+        {"month": "2015-06", "count": 125},
+        {"month": "2015-07", "count": 130},
+        {"month": "2015-08", "count": 135},
+        {"month": "2015-09", "count": 140},
+        {"month": "2015-10", "count": 145},
+        {"month": "2015-11", "count": 150},
+        {"month": "2015-12", "count": 155},
+        {"month": "2016-01", "count": 160},
+        {"month": "2016-02", "count": 165},
+        {"month": "2016-03", "count": 170},
+        {"month": "2016-04", "count": 175},
+        {"month": "2016-05", "count": 180}
+      ]
+    },
+    {
+      "department_name": "Paediatric Gastroenterology",
+      "lab_orders": [
+        {"month": "2015-05", "count": 100},
+        {"month": "2015-06", "count": 105},
+        {"month": "2015-07", "count": 110},
+        {"month": "2015-08", "count": 115},
+        {"month": "2015-09", "count": 120},
+        {"month": "2015-10", "count": 125},
+        {"month": "2015-11", "count": 130},
+        {"month": "2015-12", "count": 135},
+        {"month": "2016-01", "count": 140},
+        {"month": "2016-02", "count": 145},
+        {"month": "2016-03", "count": 150},
+        {"month": "2016-04", "count": 155},
+        {"month": "2016-05", "count": 160}
+      ]
+    },
+    {
+      "department_name": "Gastroenterology",
+      "lab_orders": [
+        {"month": "2015-05", "count": 150},
+        {"month": "2015-06", "count": 155},
+        {"month": "2015-07", "count": 160},
+        {"month": "2015-08", "count": 165},
+        {"month": "2015-09", "count": 170},
+        {"month": "2015-10", "count": 175},
+        {"month": "2015-11", "count": 180},
+        {"month": "2015-12", "count": 185},
+        {"month": "2016-01", "count": 190},
+        {"month": "2016-02", "count": 195},
+        {"month": "2016-03", "count": 200},
+        {"month": "2016-04", "count": 205},
+        {"month": "2016-05", "count": 210}
+      ]
+    },
+    {
+      "department_name": "Hematology",
+      "lab_orders": [
+        {"month": "2015-05", "count": 80},
+        {"month": "2015-06", "count": 85},
+        {"month": "2015-07", "count": 90},
+        {"month": "2015-08", "count": 95},
+        {"month": "2015-09", "count": 100},
+        {"month": "2015-10", "count": 105},
+        {"month": "2015-11", "count": 110},
+        {"month": "2015-12", "count": 115},
+        {"month": "2016-01", "count": 120},
+        {"month": "2016-02", "count": 125},
+        {"month": "2016-03", "count": 130},
+        {"month": "2016-04", "count": 135},
+        {"month": "2016-05", "count": 140}
+      ]
+    },
+    {
+      "department_name": "Hepatology",
+      "lab_orders": [
+        {"month": "2015-05", "count": 70},
+        {"month": "2015-06", "count": 75},
+        {"month": "2015-07", "count": 80},
+        {"month": "2015-08", "count": 85},
+        {"month": "2015-09", "count": 90},
+        {"month": "2015-10", "count": 95},
+        {"month": "2015-11", "count": 100},
+        {"month": "2015-12", "count": 105},
+        {"month": "2016-01", "count": 110},
+        {"month": "2016-02", "count": 115},
+        {"month": "2016-03", "count": 120},
+        {"month": "2016-04", "count": 125},
+        {"month": "2016-05", "count": 130}
+      ]
+    }
+  ]
+}
