@@ -48,72 +48,60 @@ dash_app.layout = dbc.Container([
                 })
             ], width=12)
         ]),
-    ]),
-    dbc.Row([
-        dbc.Col([
-            html.H3("Filters", style={"color": "white", "marginBottom": "20px"}),
-        ], width=12),
-    ]),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col([
-                html.Div([
-                    html.Div([
-                        html.H3('Department ', className='h3-center' ,style={"color": "white"}),
-                        dcc.Dropdown(
-                            id='dept-filter',
-                            options=[{'label': 'All Departments', 'value': 'all'}] + [{'label': dept, 'value': dept} for dept in dept_names],
-                            value='all',
-                            multi=True,
-                            className='form-control mt-2 custom-dropdown',
-                        )
-                    ], className='p-2', style={'overflow': 'visible'})
-                ], className='p-2', style={'overflow': 'visible', 'backgroundColor': '#333333', 'borderRadius': '5px'})
-            ], width=3, style={'overflow': 'visible'}),
-            dbc.Col([
-                html.Div([
-                    html.Div([
-                        html.H3('Date Range ', className='h3-center', style={"color": "white"}),
-                        dcc.DatePickerRange(
-                            id='date-range-filter',
-                            start_date=start_date,
-                            end_date=end_date,
-                            className='form-control mt-2 w-70',
-                            style={
-                                'backgroundColor': '#2c2c2c',
-                                'color': '#ffffff',
-                                'borderColor': '#4d4d4d',
-                                'text-align': 'center'
-                            },
-                            start_date_placeholder_text='Start Date',
-                            end_date_placeholder_text='End Date',
-                            display_format='DD/MM/YYYY'
-                        )
-                    ], className='p-2')
-                ], className='p-2', style={'backgroundColor': '#333333', 'borderRadius': '5px'})
-            ], width=6),
-            dbc.Col([
-                html.Div([
-                    html.Div([
-                        html.H3('Grouping',className='h3-center', style={"color": "white"}),
-                        dcc.Dropdown(
-                            id='grouping',
-                            options=[
-                                {'label': 'Weekly', 'value': 'weekly'},
-                                {'label': 'Monthly', 'value': 'monthly'},
-                                {'label': 'Yearly', 'value': 'yearly'}
-                            ],
-                            value='monthly',
-                            className='form-control mt-2 custom-dropdown',
-                        )
-                    ], className='p-2', style={'overflow': 'visible'})
-                ], className='p-2', style={'overflow': 'visible', 'backgroundColor': '#333333', 'borderRadius': '5px'})
-            ], width=3, style={'overflow': 'visible'}),
-            dbc.Col([
-                html.Div(id='disease-link')
-            ], width=8)
-        ], className='row', style={'marginBottom': '20px', 'justify-content': 'center'})
-    ], style={'backgroundColor': 'rgba(30, 30, 30, 0.8)', 'padding': '10px', 'borderRadius': '5px', 'marginBottom': '20px'}),
+    ]),html.Div(id='selected-filters', style={'color': 'white', 'fontSize': '18px', 'textAlign': 'center'}),
+    dbc.Modal(
+    [
+        dbc.ModalHeader("Filters"),
+        dbc.ModalBody([
+            html.Div([
+                html.H3('Department', className='h3-center', style={"color": "white"}),
+                dcc.Dropdown(
+                    id='dept-filter',
+                    options=[{'label': 'All Departments', 'value': 'all'}] + [{'label': dept, 'value': dept} for dept in dept_names],
+                    value='all',
+                    multi=True,
+                    className='form-control mt-2 custom-dropdown',
+                )
+            ], className='p-2', style={'overflow': 'visible'}),
+            html.Div([
+                html.H3('Date Range', className='h3-center', style={"color": "white"}),
+                dcc.DatePickerRange(
+                    id='date-range-filter',
+                    start_date=start_date,
+                    end_date=end_date,
+                    className='form-control mt-2 w-70',
+                    style={
+                        'backgroundColor': '#2c2c2c',
+                        'color': '#ffffff',
+                        'borderColor': '#4d4d4d',
+                        'text-align': 'center'
+                    },
+                    start_date_placeholder_text='Start Date',
+                    end_date_placeholder_text='End Date',
+                    display_format='DD/MM/YYYY'
+                )
+            ], className='p-2'),
+            html.Div([
+                html.H3('Grouping', className='h3-center', style={"color": "white"}),
+                dcc.Dropdown(
+                    id='grouping',
+                    options=[
+                        {'label': 'Weekly', 'value': 'weekly'},
+                        {'label': 'Monthly', 'value': 'monthly'},
+                        {'label': 'Yearly', 'value': 'yearly'}
+                    ],
+                    value='monthly',
+                    className='form-control mt-2 custom-dropdown',
+                )
+            ], className='p-2', style={'overflow': 'visible'})
+        ]),
+        dbc.ModalFooter(
+            dbc.Button("Search", id="search-button", className="ml-auto", n_clicks=0)
+        ),
+    ],
+    id="modal",
+    is_open=False,
+),dbc.Button("Open Filters", id="open-modal-button", n_clicks=0),
     # Cards for patient count, visits, and admissions
     dbc.Row([
         dbc.Col([
@@ -387,6 +375,17 @@ def update_caregiver_chart(selected_depts):
     )
 
     return fig
+
+@dash_app.callback(
+    Output("modal", "is_open"),
+    [Input("open-modal-button", "n_clicks"), Input("search-button", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
 @dash_app.callback(
     Output('selected-month-store', 'data'),
     Input('lab-orders-chart', 'clickData')
@@ -406,7 +405,6 @@ def update_selected_month(click_data):
     ],
     [ Input('dept-filter', 'value'), Input('date-range-filter', 'start_date'), Input('date-range-filter', 'end_date'), Input('grouping', 'value'),Input('selected-month-store', 'data')]
 )
-
 def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_month):
     if 'all' in selected_depts:
         dept_names = ','.join(requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/departments").json())
@@ -418,7 +416,7 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_mo
     start_date = datetime.fromisoformat(start_date).strftime('%Y-%m-%d')
     end_date = datetime.fromisoformat(end_date).strftime('%Y-%m-%d')
 
-      # Filter department-wise lab orders data if a month is selected
+    # Filter department-wise lab orders data if a month is selected
     lab_orders_data = requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/get-json/laborders.json").json()["departments"]
 
     # Prepare overall lab orders data
@@ -428,6 +426,10 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_mo
         for entry in dept["lab_orders"]
     ])
     overall_lab_orders = overall_lab_orders.groupby("month")["count"].sum().reset_index()
+
+    # Sort overall lab orders data by month
+    overall_lab_orders['month'] = pd.to_datetime(overall_lab_orders['month'])
+    overall_lab_orders = overall_lab_orders.sort_values('month')
 
     # Prepare department-wise lab orders data
     dept_lab_orders = pd.DataFrame([
@@ -457,6 +459,10 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_mo
     if selected_month:
         dept_lab_orders = dept_lab_orders[dept_lab_orders['month'] == selected_month]
 
+    # Sort department-wise lab orders data by month
+    dept_lab_orders['month'] = pd.to_datetime(dept_lab_orders['month'])
+    dept_lab_orders = dept_lab_orders.sort_values('month')
+
     # Create the department-wise lab orders chart
     lab_orders_dept_chart = go.Figure()
     for dept_name, group in dept_lab_orders.groupby("department_name"):
@@ -481,6 +487,7 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping,selected_mo
     return (
         lab_orders_chart, lab_orders_dept_chart
     )
+
 @dash_app.callback(
     [
         Output('prescriptions-chart', 'figure'),
@@ -511,6 +518,10 @@ def update_charts_pres(selected_depts, start_date, end_date, grouping, click_dat
         for entry in dept["prescription_count"]
     ])
     overall_prescriptions = overall_prescriptions.groupby("month")["count"].sum().reset_index()
+
+    # Sort overall prescriptions data by month
+    overall_prescriptions['month'] = pd.to_datetime(overall_prescriptions['month'])
+    overall_prescriptions = overall_prescriptions.sort_values('month')
 
     dept_prescriptions = pd.DataFrame([
         {"department_name": dept["department_name"], "month": entry["month"], "count": entry["count"]}
@@ -559,7 +570,6 @@ def update_charts_pres(selected_depts, start_date, end_date, grouping, click_dat
     )
 
     return prescriptions_chart, prescriptions_dept_chart, selected_month
-
 import pandas as pd
 import numpy as np
 import plotly.figure_factory as ff
@@ -626,7 +636,20 @@ def update_admission_length_chart(selected_depts, start_date, end_date):
 
     return fig, stats_text
 
-
+@dash_app.callback(
+    Output('selected-filters', 'children'),
+    [Input('dept-filter', 'value'), Input('date-range-filter', 'start_date'), Input('date-range-filter', 'end_date'), Input('grouping', 'value')]
+)
+def update_selected_filters(selected_depts, start_date, end_date, grouping):
+    if 'all' in selected_depts:
+        dept_text = 'All Departments'
+    else:
+        dept_text = ', '.join(selected_depts)
+    
+    start_date = datetime.fromisoformat(start_date).strftime('%d/%m/%Y')
+    end_date = datetime.fromisoformat(end_date).strftime('%d/%m/%Y')
+    
+    return f'Selected Filters: Departments: {dept_text} | Date Range: {start_date} - {end_date} | Grouping: {grouping.capitalize()}'
 
 @dash_app.callback(
     [
@@ -638,9 +661,15 @@ def update_admission_length_chart(selected_depts, start_date, end_date):
         Output('admissions-count', 'children')
        
     ],
-    [Input('dept-filter', 'value'), Input('date-range-filter', 'start_date'), Input('date-range-filter', 'end_date'), Input('grouping', 'value')]
+    [[Input("search-button", "n_clicks")]],
+    [
+        State('dept-filter', 'value'),
+        State('date-range-filter', 'start_date'),
+        State('date-range-filter', 'end_date'),
+        State('grouping', 'value')
+    ]
 )
-def update_charts(selected_depts, start_date, end_date, grouping):
+def update_charts(n_clicks,selected_depts, start_date, end_date, grouping):
     if 'all' in selected_depts:
         dept_names = ','.join(requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/departments").json())
     else:
@@ -654,6 +683,8 @@ def update_charts(selected_depts, start_date, end_date, grouping):
     response = requests.get(api_url)
     data = response.json()
     df = pd.DataFrame(data)
+    df = df.sort_values('data_from', ascending=True)
+
     print(start_date)
     print(end_date)
     print(df.columns)
