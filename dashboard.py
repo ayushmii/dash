@@ -694,10 +694,20 @@ def update_selected_filters(selected_depts, start_date, end_date, grouping):
     end_date = datetime.fromisoformat(end_date).strftime('%d/%m/%Y')
     
     return html.Div([
-        html.Div(f'Departments: {dept_text}', className='filter-box'),
-        html.Div(f'Date Range: {start_date} - {end_date}', className='filter-box'),
-        html.Div(f'Grouping: {grouping.capitalize()}', className='filter-box')
-    ], className='selected-filters-container')
+    html.Div([
+        html.H3('Departments'),
+        html.H2(dept_text)
+    ], className='filter-box'),
+    html.Div([
+        html.H3('Date Range'),
+        html.H2(f'{start_date} - {end_date}')
+    ], className='filter-box'),
+    html.Div([
+        html.H3('Grouping'),
+        html.H2(grouping.capitalize())
+    ], className='filter-box')
+], className='selected-filters-container')
+
 @dash_app.callback(
     [
         Output('patient-count-chart', 'figure'),

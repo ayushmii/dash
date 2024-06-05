@@ -39,7 +39,6 @@
   border: 1px solid #333333;
   transition: transform 0.3s ease;
 }
-
 .filter-box:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px #d0ced366;
@@ -334,7 +333,8 @@ text-align: center;
   padding: 20px !important;
 }
 h3{
-  color: var(--text-color) !important;
+  color: #bac !important;
+  text-shadow: rgba(0, 0, 0, 0.156) 0px 0px 10px !important;
 }
 .card-content h3 {
   font-size: 24px !important;
