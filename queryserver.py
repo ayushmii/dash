@@ -14,8 +14,8 @@ CORS(app)
 conn = psycopg2.connect(
     host="localhost",
     database="pgi_data",
-    user="ayush",
-    password="aysh7139"
+    user="postgres",
+    password="zxc321"
 )
 cur = conn.cursor()
 
