@@ -4,18 +4,18 @@ import psycopg2
 import requests
 from flask import Blueprint, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
 
-load_dotenv()  # take environment variables from .env.
-
+from dotenv import dotenv_values
+env_vars = dotenv_values('.env')  
 app = Flask(__name__)
+
 CORS(app)
 # Database connection
 conn = psycopg2.connect(
-    host="localhost",
+   host="localhost",
     database="pgi_data",
-    user="postgres",
-    password="zxc321"
+    user=env_vars.get('POSTGRES_USER', 'ayush'),
+    password=env_vars.get('POSTGRES_PASSWORD', 'aysh7139')
 )
 cur = conn.cursor()
 

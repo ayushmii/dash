@@ -30,7 +30,7 @@ dash_app = Dash(server=app, routes_pathname_prefix='/dash/', external_stylesheet
 
 # Default date range
 start_date = datetime(2010, 1, 1)
-end_date = datetime(2019, 12, 31)
+end_date = datetime(2011, 5, 31)
 
 # Fetch department names
 dept_names = requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/departments").json()
@@ -442,6 +442,9 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping, click_data
         dept_names = ','.join(requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/departments").json())
     else:
         dept_names = ','.join(selected_depts)
+    
+    if not selected_depts:
+        return go.Figure(), go.Figure()
 
     start_date = datetime.fromisoformat(start_date).strftime('%Y-%m-%d')
     end_date = datetime.fromisoformat(end_date).strftime('%Y-%m-%d')
@@ -492,9 +495,9 @@ def update_charts_lab(selected_depts, start_date, end_date, grouping, click_data
     if selected_month:
         dept_lab_orders = dept_lab_orders[dept_lab_orders['month'] == selected_month]
 
-    print(dept_lab_orders)
-    print("SELECTED MONTH")
-    print(selected_month)
+    #print(dept_lab_orders)
+    #print("SELECTED MONTH")
+    #print(selected_month)
 
     for dept_name, group in dept_lab_orders.groupby("department_name"):
         lab_orders_dept_chart.add_trace(go.Bar(
@@ -538,6 +541,9 @@ def update_charts_pres(selected_depts, start_date, end_date, grouping, click_dat
         dept_names = ','.join(requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/departments").json())
     else:
         dept_names = ','.join(selected_depts)
+    
+    if not selected_depts:
+        return go.Figure(), go.Figure(), ''
 
     prescription_data = requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/get-json/prescription.json").json()["departments"]
     start_date = datetime.fromisoformat(start_date).strftime('%Y-%m-%d')
@@ -584,14 +590,14 @@ def update_charts_pres(selected_depts, start_date, end_date, grouping, click_dat
     if selected_month:
         dept_prescriptions = dept_prescriptions[dept_prescriptions["month"] == selected_month]
 
-    print(dept_prescriptions)
-    print("SELECTED")
-    print(selected_month)
+    #print(dept_prescriptions)
+    #print("SELECTED")
+    #print(selected_month)
 
     dept_counts = dept_prescriptions.groupby("department_name")["count"].sum().reset_index()
 
-    print("DEPARTMENT COUNTS")
-    print(dept_counts)
+    #print("DEPARTMENT COUNTS")
+    #print(dept_counts)
 
     prescriptions_dept_chart.add_trace(go.Pie(
         labels=dept_counts["department_name"],
@@ -618,8 +624,8 @@ def compute_admission_length_stats(start_date, end_date):
     for admission in admission_data:
         admission_date = datetime.fromisoformat(admission["admission_date"])
         discharge_date = datetime.fromisoformat(admission["discharge_date"])
-        print(admission_date)
-        print(discharge_date)
+        #print(admission_date)
+        #print(discharge_date)
         admission_length = (discharge_date - admission_date).days
 
         if start_date <= admission_date <= end_date:
@@ -658,6 +664,8 @@ def compute_admission_length_stats(start_date, end_date):
     [Input('dept-filter', 'value'), Input('date-range-filter', 'start_date'), Input('date-range-filter', 'end_date')]
 )
 def update_admission_length_chart(selected_depts, start_date, end_date):
+    if not selected_depts:
+        return go.Figure(), ''
     start_date = datetime.fromisoformat(start_date)
     end_date = datetime.fromisoformat(end_date)
 
@@ -713,42 +721,114 @@ def update_charts(n_clicks,selected_depts, start_date, end_date, grouping):
         dept_names = ','.join(requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/departments").json())
     else:
         dept_names = ','.join(selected_depts)
-
+    if not selected_depts:
+        # No department selected, return empty or default figures
+        empty_figure = go.Figure()
+        empty_figure.update_layout(
+            title='No Department Selected',
+            xaxis_title='',
+            yaxis_title='',
+            plot_bgcolor='rgba(17, 17, 17, 1)',
+            paper_bgcolor='rgba(17, 17, 17, 1)',
+            font_color='white'
+        )
+        return (
+            empty_figure, empty_figure, empty_figure,
+            0, 0, 0
+        )
     prescription_data = requests.get(f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/get-json/prescription.json").json()["departments"]
     
     start_date = datetime.fromisoformat(start_date).strftime('%Y-%m-%d')
     end_date = datetime.fromisoformat(end_date).strftime('%Y-%m-%d')
     api_url = f"http://localhost:{os.getenv('QUERRY_SERVER_PORT', 7655)}/patient_counts?dept_names={dept_names}&start_date={start_date}&end_date={end_date}&grouping={grouping}"
+    print(api_url)
     response = requests.get(api_url)
     data = response.json()
     df = pd.DataFrame(data)
-    df = df.sort_values('data_from', ascending=True)
-
+    df['data_date'] = pd.to_datetime(df['data_date'])
+    df['data_from'] = pd.to_datetime(df['data_from'])
+    df['data_upto'] = pd.to_datetime(df['data_upto'])
+    if(grouping == 'weekly'):
+        df['data_date'] = df['data_date'].dt.strftime('%d/%m/%Y')
+        df['data_from'] = df['data_from'].dt.strftime('%d/%m/%Y')
+        df['data_upto'] = df['data_upto'].dt.strftime('%d/%m/%Y')
+    if(grouping == 'monthly'):
+        df['data_date'] = df['data_date'].dt.strftime('%m/%Y')
+        df['data_from'] = df['data_from'].dt.strftime('%m/%Y')
+        df['data_upto'] = df['data_upto'].dt.strftime('%m/%Y')
+    if(grouping == 'yearly'):
+        df['data_date'] = df['data_date'].dt.strftime('%Y')
+        df['data_from'] = df['data_from'].dt.strftime('%Y')
+        df['data_upto'] = df['data_upto'].dt.strftime('%Y')
+    
+    
+    df.to_csv('file1.csv')
     print(start_date)
     print(end_date)
-    print(df.columns)
-    patient_count_chart = px.line(df[df['col1'] == 'ENCOUNTER_VISIT'], x='data_date', y='patient_count', color='dept_name')
-    total_patient_count = df[df['col1'] == 'ENCOUNTER_VISIT'].groupby('data_date')['patient_count'].sum().reset_index()
-    patient_count_chart.add_trace(go.Scatter(x=total_patient_count['data_date'], y=total_patient_count['patient_count'], mode='lines', name='Total', line=dict(color='white', width=2)))
-    patient_count_chart.update_layout(
-        title='Patients',
-        xaxis_title='Time',
-        yaxis_title='Patient Count',
-        plot_bgcolor='rgba(17, 17, 17, 1)',  # Set plot background color to dark grey
-        paper_bgcolor='rgba(17, 17, 17, 1)',  # Set paper background color to dark grey
-        font_color='white',  # Set font color to white
-        xaxis_gridcolor='rgba(51, 51, 51, 1)',  # Set grid line color for x-axis
-        yaxis_gridcolor='rgba(51, 51, 51, 1)',  # Set grid line color for y-axis
-        legend=dict(orientation="h", yanchor="bottom", y=1.00, xanchor="right",title='Departments', x=1)
+    #print(df.columns)
+ 
+    patient_count_df = df[df['col1'] == 'ENCOUNTER_VISIT']
+    if len(patient_count_df['data_date'].unique()) == 1:
+        # Convert to pie chart if there is only a single data point
+        patient_count_chart = go.Figure(data=[go.Pie(labels=patient_count_df['dept_name'], values=patient_count_df['patient_count'])])
+        patient_count_chart.update_layout(
+            title='Patient Count by Department',
+            plot_bgcolor='rgba(17, 17, 17, 1)',
+            paper_bgcolor='rgba(17, 17, 17, 1)',
+            font_color='white',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+    else:
+        # Use line chart if there are multiple data points
+        # Sort the data by 'data_date' for each department
+        # Sort the data by 'data_date' for each department
+        patient_count_df = patient_count_df.sort_values(['dept_name', 'data_date'])
 
-    )
+        # Create a new column 'date_order' to assign a unique order to each data point
+        patient_count_df['date_order'] = patient_count_df.groupby('dept_name').cumcount()
 
-    # Admissions
+        # Create the line chart using 'date_order' as the x-axis
+        patient_count_chart = px.line(patient_count_df, x='date_order', y='patient_count', color='dept_name')
+
+        # Calculate the total patient count for each date
+        total_patient_count = patient_count_df.groupby('data_date')['patient_count'].sum().reset_index().sort_values('data_date')
+        total_patient_count['date_order'] = total_patient_count.index
+
+        # Add the total patient count line to the chart
+        patient_count_chart.add_trace(go.Scatter(x=total_patient_count['date_order'], y=total_patient_count['patient_count'], mode='lines', name='Total', line=dict(color='white', width=2)))
+
+        # Set the x-axis tick values and labels to display the actual dates
+        patient_count_chart.update_layout(
+            xaxis=dict(
+                tickmode='array',
+                tickvals=patient_count_df['date_order'].unique(),
+                ticktext=patient_count_df['data_date'].unique()
+            )
+        )
+
+        # Update the chart layout
+        patient_count_chart.update_layout(
+            title='Patients',
+            xaxis_title='Time',
+            yaxis_title='Patient Count',
+            plot_bgcolor='rgba(17, 17, 17, 1)',
+            paper_bgcolor='rgba(17, 17, 17, 1)',
+            font_color='white',
+            xaxis_gridcolor='rgba(51, 51, 51, 1)',
+            yaxis_gridcolor='rgba(51, 51, 51, 1)',
+            legend=dict(orientation="h", yanchor="bottom", y=1.00, xanchor="right", title='Departments', x=1)
+        )
+# Admissions
+    df.to_csv('file1.csv')
+
     admissions_df = df[df['col1'] == 'ADMISSIONS']
     #print(admissions_df)
-
+    if(grouping=='monthly'):
+        admissions_df['data_date']=pd.to_datetime(admissions_df['data_date'], format='%m/%Y')
+    if(grouping=='weekly'):
+        admissions_df['data_date']=pd.to_datetime(admissions_df['data_date'], format='%d/%m/%Y')
     admissions_chart = go.Figure()
-
+    print(admissions_df.columns)
     # Add a bar trace for rec_count
     admissions_chart.add_trace(go.Bar(
         x=admissions_df['data_date'],
@@ -767,6 +847,11 @@ def update_charts(n_clicks,selected_depts, start_date, end_date, grouping):
 
     # Calculate the total rec_count and add it as a separate trace
     total_admissions_count = admissions_df.groupby('data_date')['rec_count'].sum().reset_index()
+    if(grouping=='monthly'):
+        total_admissions_count['data_date'] = pd.to_datetime(total_admissions_count['data_date'], format='%m/%Y')
+    if(grouping=='weekly'):
+        total_admissions_count['data_date'] = pd.to_datetime(total_admissions_count['data_date'], format='%d/%m/%Y')
+    total_admissions_count.to_csv('file2.csv')
     admissions_chart.add_trace(go.Scatter(
         x=total_admissions_count['data_date'],
         y=total_admissions_count['rec_count'],
@@ -791,40 +876,68 @@ def update_charts(n_clicks,selected_depts, start_date, end_date, grouping):
     # Visits
     visits_df = df[(df['col1'] == 'ENCOUNTER_VISIT')]
 
-    visits_chart = go.Figure()
+    if len(visits_df['data_date'].unique()) == 1:
+        # Convert to pie chart if there is only a single data point
+        visits_chart = go.Figure(data=[go.Pie(labels=visits_df['dept_name'], values=visits_df['rec_count'])])
+        visits_chart.update_layout(
+            title='Visits by Department',
+            plot_bgcolor='rgba(17, 17, 17, 1)',
+            paper_bgcolor='rgba(17, 17, 17, 1)',
+            font_color='white',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+    else:
+        # Use area chart if there are multiple data points
+        visits_chart = go.Figure()
 
-    # Add area traces for each department
-    for dept_name, group in visits_df.groupby('dept_name'):
+        # Sort the data by 'data_date' for each department
+        visits_df = visits_df.sort_values(['dept_name', 'data_date'])
+
+        # Create a new column 'date_order' to assign a unique order to each data point
+        visits_df['date_order'] = visits_df.groupby('dept_name').cumcount()
+
+        # Add area traces for each department
+        for dept_name, group in visits_df.groupby('dept_name'):
+            visits_chart.add_trace(go.Scatter(
+                x=group['date_order'],
+                y=group['rec_count'],
+                mode='lines',
+                stackgroup='one',
+                name=dept_name,
+                fill='tozeroy'  # Fill the area under the line
+            ))
+
+        # Add a trace for the total visits count
+        total_visits_count = visits_df.groupby('data_date')['rec_count'].sum().reset_index().sort_values('data_date')
+        total_visits_count['date_order'] = total_visits_count.index
         visits_chart.add_trace(go.Scatter(
-            x=group['data_date'],
-            y=group['rec_count'],
+            x=total_visits_count['date_order'],
+            y=total_visits_count['rec_count'],
             mode='lines',
-            stackgroup='one',
-            name=dept_name,
-            fill='tozeroy'  # Fill the area under the line
+            name='Total',
+            line=dict(color='white', width=2)
         ))
 
-    # Add a trace for the total visits count
-    total_visits_count = visits_df.groupby('data_date')['rec_count'].sum().reset_index()
-    visits_chart.add_trace(go.Scatter(
-        x=total_visits_count['data_date'],
-        y=total_visits_count['rec_count'],
-        mode='lines',
-        name='Total',
-        line=dict(color='white', width=2)
-    ))
+        # Set the x-axis tick values and labels to display the actual dates
+        visits_chart.update_layout(
+            xaxis=dict(
+                tickmode='array',
+                tickvals=visits_df['date_order'].unique(),
+                ticktext=visits_df['data_date'].unique()
+            )
+        )
 
-    visits_chart.update_layout(
-        title='Visits',
-        xaxis_title='Date',
-        yaxis_title='Visit Count',
-        plot_bgcolor='rgba(17, 17, 17, 1)',
-        paper_bgcolor='rgba(17, 17, 17, 1)',
-        font_color='white',
-        xaxis_gridcolor='rgba(51, 51, 51, 1)',
-        yaxis_gridcolor='rgba(51, 51, 51, 1)',
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right",title="Departments", x=1)
-    )
+        visits_chart.update_layout(
+            title='Visits',
+            xaxis_title='Date',
+            yaxis_title='Visit Count',
+            plot_bgcolor='rgba(17, 17, 17, 1)',
+            paper_bgcolor='rgba(17, 17, 17, 1)',
+            font_color='white',
+            xaxis_gridcolor='rgba(51, 51, 51, 1)',
+            yaxis_gridcolor='rgba(51, 51, 51, 1)',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", title="Departments", x=1)
+        )
 
     total_patients = df[df['col1'] == 'ENCOUNTER_VISIT']['patient_count'].sum()
 
